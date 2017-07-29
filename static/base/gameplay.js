@@ -15,4 +15,10 @@ wHeader.setContent(undefined, '#f00');
 wTopPanel.setContent(undefined, '#0f0');
 wContent.setContent(undefined, '#00f');
 
+var wDebug = new B.Widget();
+var eDebug = document.createElement('div');
+wDebug.setContent(eDebug, '#000');
+wRoot.addItem(wDebug, '300px');
+publisher.registerSubscriber(new B.StateDebugWidget(eDebug));
+
 publisher.registerSubscriber(new HeaderWidget(wHeader));
