@@ -1,0 +1,36 @@
+body{
+    /*background: #400;*/
+}
+#header{
+    background: #000;
+}
+#header *{
+    display: inline-block;
+}
+#header .logo{
+    /*background: #222;*/
+    background: url('header.png') 0 0;
+    width:152px;
+    height: 64px;
+}
+#header .logo:hover{
+    background: url('header.png') 0 -64px;
+}
+#header .vm{
+    /*background: #444;*/
+    background: url('header.png') -152px 0;
+    width: 182px;
+    height: 64px;
+}
+#header .vm:hover{
+    background: url('header.png') -152px -64px;
+}
+#header .django{
+    /*background: #666;*/
+    background: url('header.png') -334px 0;
+    width: 112px;
+    height: 64px;
+}
+#header .django:hover{
+    background: url('header.png') -334px -64px;
+}

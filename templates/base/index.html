@@ -1,0 +1,14 @@
+{% load static %}
+<!doctype html>
+<html>
+<head>
+<script src="{% static 'contrib/b.js' %}"></script>
+<script src="{% static 'base/header_widget.js' %}"></script>
+{% block init_state %}
+{% endblock %}
+<link href="{% static 'base/style.css' %}" rel="stylesheet"/>
+</head>
+<body>
+<script src="{% static 'base/gameplay.js' %}"></script>
+</body>
+</html>
