@@ -22,3 +22,4 @@ wRoot.addItem(wDebug, '300px');
 publisher.registerSubscriber(new B.StateDebugWidget(eDebug));
 
 publisher.registerSubscriber(new HeaderWidget(wHeader));
+publisher.registerSubscriber(new Pager());

@@ -11,21 +11,19 @@ function HeaderWidget(wHeader){
     var eDjango = document.createElement('div');
     eDjango.className = 'django';
 
-    //(function(self){
-        var self = this;
-        eLogo.addEventListener('click', function(){
-            self._state.show_page = 0;
+    var self = this;
+    eLogo.addEventListener('click', function(){
+            self._state.show_page = 'root';
             self._registerStateChanges();
-        });
-        eVm.addEventListener('click', function(){
-            self._state.show_page = 1;
+            });
+    eVm.addEventListener('click', function(){
+            self._state.show_page = 'vm';
             self._registerStateChanges();
-        });
-        eDjango.addEventListener('click', function(){
-            self._state.show_page = 2;
+            });
+    eDjango.addEventListener('click', function(){
+            self._state.show_page = 'django';
             self._registerStateChanges();
-        });
-    //})(this);
+            });
 
     eContainer.appendChild(eLogo);
     eContainer.appendChild(eVm);
@@ -40,4 +38,7 @@ function HeaderWidget(wHeader){
 HeaderWidget.prototype = Object.create(B.StateSubscriber.prototype);
 HeaderWidget.constructor = HeaderWidget;
 HeaderWidget.prototype.processStateChanges = function(s){
+    if (!s.hasOwnProperty('show_page'))
+        s.show_page = 'root';
+    this._registerStateChanges();
 }
