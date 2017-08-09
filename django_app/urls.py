@@ -3,5 +3,5 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 
 urlpatterns = [
-    url(r'^django/$', TemplateView.as_view(template_name='django_app/index.html')),
+    url(r'^django/$', TemplateView.as_view(template_name='django_app/index.html'), name='django'),
 ]

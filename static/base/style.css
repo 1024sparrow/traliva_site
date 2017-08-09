@@ -7,12 +7,12 @@ body{
 #header *{
     display: inline-block;
 }
-#header .logo{
+#header .top_root{
     background: url('header.png') 0 0;
     width:152px;
     height: 64px;
 }
-#header .logo:hover{
+#header .top_root:hover{
     background: url('header.png') 0 -64px;
 }
 #header .vm{
@@ -23,6 +23,9 @@ body{
 #header .vm:hover{
     background: url('header.png') -152px -64px;
 }
+#header .vm.active{
+    background: url('header.png') -152px -128px;
+}
 #header .django{
     background: url('header.png') -334px 0;
     width: 112px;
@@ -30,4 +33,7 @@ body{
 }
 #header .django:hover{
     background: url('header.png') -334px -64px;
+}
+#header .django.active{
+    background: url('header.png') -334px -128px;
 }
