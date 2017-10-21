@@ -35,10 +35,9 @@ else (function(){
 var StatePublisher = function(){
 	this.__state = {};//empty state by default untill be set
 	this.__subscribers = [];
-	this.xmlDocument
 };
 StatePublisher.prototype.state = function(){
-	return this__state;
+	return this.__state;
 };
 StatePublisher.prototype.setState = function(state){//parameter is an Object
 	this.__state = state;
@@ -524,6 +523,8 @@ Strip.prototype.setItemSize = function(sizeMap){//usage example: wRoot.setItemSi
 function Stack(p_parentWidget, p_ifCutTails){
 	this.__items = [];
 	this.__zIndexCounter = 1;
+    this._w = undefined;
+    this._h = undefined;
 
 	this._eStack = document.createElement('div');
 	this._eStack.style.position = 'relative';
@@ -535,6 +536,8 @@ Stack.prototype._createContentElem = function(){
 	return this._eStack;
 }
 Stack.prototype._onResized = function(w,h){
+    this._w = w;
+    this._h = h;
 	for (var i = 0 ; i < this.__items.length ; i++){
 		var item = this.__items[i];
 		item.resize(w,h);
@@ -555,6 +558,9 @@ Stack.prototype.addItem = function(p_itemWidget){
 	p_itemWidget._div.style.top = '0';
 	this._eStack.appendChild(p_itemWidget._div);
 	this.__items.push(p_itemWidget);
+    //boris here: должны отресайзить добавляемый виджет
+    if (this._w)
+        p_itemWidget.resize(this._w, this._h);
 
 	this.__zIndexCounter++;
 }

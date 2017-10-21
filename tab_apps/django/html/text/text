@@ -1,0 +1,2539 @@
+<p style="float:right;">&copy;Васильев Б.П.</p>
+<h1>Пишем веб-приложение на Django</h1>
+
+<!--
+Вопросы, которые НЕ освещены в данной книге:
+- Установка Django.
+- Работа с базой данных. Имеется ввиду, не освещена работа с реальной БД, принесённой откуда-то (или унаследованной), а ещё в БД есть отображения, функции, даже работа с реляционными таблицами не описана.
+- Тестирование. Это мне лично очень интересная тема - как организовать действительнно толковое тестирование в проекте. В данной книге тема тестирования не отражена, хотя в официальной документации даже на их HelloWorld по имени Polls писались тесты.
+- Разворачивание готового проекта на боевом веб-сервере.
+
+И вообще, данная книга написана лишь как отправная точка в деле изучения Django, и даёт лишь базовую информацию о возможностях Django. Лучший учитель - это самостоятельно набитые шишки - лишь с опытом приходит мастерство. За более подробной информацией обращайтесь к официальной документации, ещё посмотрите материалы из раздела "Литература", ну и форумы, конечно. 
+-->
+
+<h2>О книге</h2>
+<p>Формат книги - методичка. Она предназначена для программистов, не знакомых с Django, которым нужно в кратчайшие сроки разобраться с Django и уже разрабатывать свои веб-приложения на Django</p>
+<p>Данная книга писалась по мере изучения <a href="../django.pdf" download>официальной документации</a> (помимо официальной документации также использовались книги <a href="#source100" target="_blank">Два шарика Django</a> и <a href="#source200" target="_blank">Начала электронной коммерции Django</a>). В официальной документации в качестве "быстрого старта" предлагается инструкция по написанию полноценного веб-приложения (Polls, опросник), сложного для HelloWorld-а (на мой взгляд), инструкция пошаговая, в семи частях. В нашей книге вы найдёте не один HelloWorld, написанный в семь шагов, а семь HelloWorld-ов, где каждый последующий использует понятия, введённые в предыдущих HelloWorld-ах. Картинки не привожу - следуя инструкциям, мы их получите сами:)</p>
+<p>Данную книгу надо не читать, а кодить, и строго последовательно с первого HelloWold до последнего, ничего не пропуская. Желаю удачи в освоении Django!</p>
+
+<h2>Версия Django, которая вам понадобится</h2>
+Все примеры из данного руководства писались на Django версии 1.10.6.<br/>
+Версия Django на моём хостинге: 1.8.9. На этой версии примеры работают нормально.<br/>
+Версия Django на моём домашнем компе: 1.11.1. Здесь тоже всё OK.<br/>
+Как посмотреть версию Django:
+<inline_code>
+<shell_welcome>$</shell_welcome> python<br/>
+<shell_welcome>>>></shell_welcome> import django<br/>
+<shell_welcome>>>></shell_welcome> print(django.get_version())
+</inline_code>
+или просто
+<inline_code><shell_welcome>$</shell_welcome> django-admin --version</inline_code>
+
+<h2>Вступительное слово</h2>
+
+<p>Чего-то страшного от Django ожидать не стоит, ибо разработчики данного фреймворка как раз над тем и трудились, чтобы вам поменьше париться, работая над своим <span style="text-decoration:line-through;">сокровищем</span> проектом. Начать проект легко - вам не нужно поднимать сервер базы данных (по умолчанию используется своя БД Sqlite, которую можно потом легко заменить на стороннюю БД), вам даже не нужно поднимать Apache - в комплекте идёт свой отладочный веб-сервер. Если в первом примере у вас получится не сказочно красивое приложение (и кажется невероятно сложным написание нормального веб-приложения), не переживайте - всё скоро изменится.</p>
+
+<p>Читать данный документ надо в linux-e, имея под боком консоль. Предполагается, что python и django уже установлены у вас в системе, так что...</p>
+
+<p>Лезем в косоль, создаём директорию под наши примеры, создаём директорию под наш первый HelloWorld и читаем далее, что нам делать...</p>
+
+<h2>Hello World №1: вьюхи</h2>
+
+<p>Давайте обозначим: "проект" - это весь наш сайт со всеми его страничками, "приложение"(app) - это какая-то страничка, или их какое-то скопление, вообщем это какая-то часть проекта. Но эта часть может быть также использоваться и в другом проекте. Проект - это наш продукт, который как из строительных блоков собирается из приложений.</p>
+Создаём проект. Для этого в консоли набираем...</p>
+<inline_code><shell_welcome>$</shell_welcome> django-admin startproject hw1</inline_code>
+<p>У нас появилась директория hw1(сокращение от "HelloWorld №1") с нашим проектом. Но что за веб-приложение(проект) без веб-странички(приложения)? Заходим в директорию проекта и создаём приложение:</p>
+<inline_code><shell_welcome>hw1$</shell_welcome> python manage.py startapp root_app</inline_code>
+<p>Мы создали приложение, которое соответствует страничке в корне нашего сайта.</p>
+<inline_code><shell_welcome>hw1/root_app$</shell_welcome> ls<br/>__init__.py  admin.py  apps.py  migrations  models.py  tests.py  views.py</inline_code>
+<p>Открываем views.py в директории root_app.</p>
+<p style="border-radius:10px;background:#444;color:#ccc;padding:20px;"> <hl style="color:#000;">То, что мы руками вводим, выделено цветом.</hl> То, что цветом не выделено, уже было в файле, и мы это оставляем как есть.<br/> </p>
+<inline_code><m_title>hw1 / root_app / views.py :</m_title><br/>
+from django.shortcuts import render
+<br/><hl>from django.http import HttpResponse</hl>
+<br/><br/># Create your views here.<br/>
+<hl>def index(request):
+<br/><tab></tab>return HttpResponse('I am Root.')</hl>
+</inline_code>
+<p>Но с одной страничкой жить не интересно. Сделаем ещё одну.</p>
+<inline_code><shell_welcome>hw1$</shell_welcome> python manage.py startapp branch_app<br/>
+<shell_welcome>hw1$</shell_welcome> ls<br/>
+branch_app  hw1  manage.py  root_app</inline_code>
+<p>Подобно тому, как мы определили вывод корневой вьюхи, для нашей новой вьюхи тоже необходимо задать текст вывода (код не привожу, сделайте это сами).</p>
+<p>Теперь, когда у нас есть аж две вьюхи (считай, странички), нам необходимо прописать их по тому или иному адресу (мы пока что нигде в коде не задавали, чтобы root_app соответствовал корневой страничке, а branch_app - не корневой). Для этого в наших директориях root_app и branch_app создадим по файлу urls.py(сейчас их там нет). В каждом из этих файлов пропишем, где должны быть страницы относительно того пути, по которому будет опубликовано приложение(app, root_app или branch_app), в виде списка urlpatterns:</p>
+<inline_code>
+<m_title>hw1 / root_app / urls.py :<br/>hw1 / branch_app / urls.py :</m_title><br/>
+<hl>from django.conf.urls import url<br/>
+from . import views<br/><br/>
+urlpatterns = [<br/>
+<tab></tab>url(r'^$', views.index, name='index'),<br/>
+]
+</hl></inline_code>
+<p>В одном приложении может быть более одной страницы. Мы сделали по одной (по адресу прописки самого приложения). И вот эти вот два приложения мы теперь пропишем по адресам "localhost" и "localhost/branch". Всё это делается в файле urls.py директории проекта:</p>
+<inline_code>
+<m_title>hw1 / hw1 / urls.py :</m_title><br/>
+from django.conf.urls import url<hl>, include</hl><br/>
+from django.contrib import admin<br/>
+<br/>
+urlpatterns = [<br/>
+<hl><tab></tab>    url(r'^', include('root_app.urls')),<br/>
+<tab></tab>    url(r'^branch/', include('branch_app.urls')),</hl><br/>
+<tab></tab>    url(r'^admin/', admin.site.urls),<br/>
+]
+</inline_code>
+<p>Мы завершили написание своего первого проекта. Как бы теперь посмотреть, что будет на выходе? Запускаем отладочный веб-сервер:</p>
+<inline_code><shell_welcome>hw1$</shell_welcome> python manage.py runserver 8080<br/>
+</inline_code>
+<p>Теперь можно открывать браузер и смотреть, что происходит по адресам "localhost:8080" и "localhost:8080/branch". Мы явно указали порт. Это связано с тем, что у нас в образе ОС уже установлен и автостартует веб-сервер. Чтобы не конфликтовать с другими серверами, уходим на "запасной" порт. Используйте порты 8000 и 8080 (можно даже обновременно в браузере смотреть два проекта, независимо запущенных на одной и той же машине).</p>
+<p>Поздравляю! Вы написали свой первый HelloWorld на Django! Напоминаю, что нашей целью было познать вьюхи.</p>
+<h2>Hello World №2: БД и модели</h2>
+<p>Допустим, вы хотите, чтобы содержимое вашей странички каким-либо образом зависело от того, что до этого ввёл пользователь. Пусть у нас в приложении пользователь выбирает какую-то книгу, книга какое-то время на сервере генерируется, пока у пользователя горит "вейтинг", высылается пользователю и полозователь работает далее, не уходя с текущей страницы(AJAX). Вьюха, вообще-то говоря, одновременно может работать с многими пользователями, так что хранить состояние страницы каждого пользователя необходимо где-то... в каком-то хранилище...  В базе данных.</p>
+<p>Под понятием "модель" в Django понимается Object-Related-Model(ORM), объектное представление базы данных. Если вся работа с БД ведётся через модели, то вы скоро совсем забудете, что означает слово "SQL".  Если ничего не настраивать (а это как раз наш случай!), то база данных у нас уже есть, это база Sqlite, и файл БД Sqlite будет сгенерирован в директорию проекта. Итак, начинаем!</p>
+<p>Создаём новый проект ("hw2"), туда добавляем новое приложение ("book_app").</p>
+<p>Мы начали работу над проектом. Мы будем писать книжный интернет-магазин. У нас должен быть в БД список книг. Создадим модель Books.</p>
+<inline_code><m_title>hw2 / book_app / models.py :</m_title><br/>
+from __future__ import unicode_literals<br/>
+<br/>
+from django.db import models<br/>
+<br/>
+# Create your models here.<br/>
+<hl>class Books(models.Model):<br/>
+<tab></tab>author = models.CharField(max_length=200)<br/>
+<tab></tab>title = models.CharField(max_length=200)<br/>
+<tab></tab>pub_date = models.DateTimeField('date published')<br/>
+<tab></tab>rating = models.IntegerField(default=0)<br/>
+<tab></tab>def __str__(self):<br/>
+<tab></tab><tab></tab>return '[' /static/tab_apps/django/html/text/ self.author /static/tab_apps/django/html/text/ '] ' /static/tab_apps/django/html/text/ self.title<hl/>
+</inline_code>
+<p>Вот так мы определили таблицу БД. Таблицы также могут быть взаимосвязанными (реляционными), а ещё не возбраняется писать методы, внутри которых сокрыты манипуляции с самими таблицами - подробности найдёте в официальной документации. А сейчас нам надо активировать свою модель. В директории проекта есть файлик settings.py:</p>
+<inline_code>
+<m_title>hw2 / hw2 / settings.py :</m_title><br/>
+....<br/>
+# Application definition<br/>
+<br/>
+INSTALLED_APPS = [<br/>
+<tab></tab>   'django.contrib.admin',<br/>
+<tab></tab>   'django.contrib.auth',<br/>
+<tab></tab>   'django.contrib.contenttypes',<br/>
+<tab></tab>   'django.contrib.sessions',<br/>
+<tab></tab>   'django.contrib.messages',<br/>
+<tab></tab>   'django.contrib.staticfiles',<br/>
+<tab></tab><hl>   'book_app.apps.BookAppConfig',</hl><br/>
+]<br/>
+....
+</inline_code>
+<p>Генерируем скрипт "миграции": скрипт для создания БД.</p>
+<inline_code><shell_welcome>hw2$</shell_welcome> python manage.py makemigrations book_app</inline_code>
+<p>Сгенерированный скрипт находится в директории hw2/book_app/migrations/ и называется "0001_initial.py". Чтобы посмотреть запрос в БД, который будет создавать наши таблицы, необходимо выполнить в консоли следующее:</p>
+<inline_code><shell_welcome>hw2$</shell_welcome>
+python manage.py sqlmigrate book_app 0001<br/>
+BEGIN;<br/>
+--<br/>
+-- Create model Books<br/>
+--<br/>
+CREATE TABLE "book_app_books" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "author" varchar(200) NOT NULL,"title" varchar(200) NOT NULL, "pub_date" datetime NOT NULL, "rating" integer NOT NULL);
+COMMIT;
+</inline_code>
+<p>Скрипт генерации таблиц БД сгенерирован. Запускаем:</p>
+<inline_code><shell_welcome>hw2$</shell_welcome>
+python manage.py migrate
+</inline_code>
+<p>Давайте посмотрим, как мы можем работать с книгами посредством нашей модели. Запускаем консоль python с доступом к модели:</p>
+<inline_code><shell_welcome>hw2$</shell_welcome> python manage.py shell</inline_code><br/>
+<inline_code>
+<shell_welcome>>>></shell_welcome> import django<br/>
+<shell_welcome>>>></shell_welcome> django.setup()<br/>
+<shell_welcome>>>></shell_welcome> from book_app.models import Books<br/>
+<shell_welcome>>>></shell_welcome> Books.objects.all()<br/>
+&lt;QuerySet []&gt;<br/>
+<shell_welcome>>>></shell_welcome> from django.utils import timezone<br/>
+<shell_welcome>>>></shell_welcome> q = Books(author='L.Tolstoy',title='Peace and War',rating=1,pub_date=timezone.now())<br/>
+<shell_welcome>>>></shell_welcome> q.save()<br/>
+<shell_welcome>>>></shell_welcome> Books.objects.all()<br/>
+&lt;QuerySet [&lt;Books: [L.Tolstoy] Peace and War&gt;]&gt;<br/>
+<shell_welcome>>>></shell_welcome> q.id<br/>
+1<br/>
+<shell_welcome>>>></shell_welcome> q.author<br/>
+'L.Tolstoy'<br/>
+</inline_code>
+<p>Books.objects.filter(id=1) <-- даёт список<br/>
+Bookd.objects.get(id=2) <-- даёт только один (первый попавшийся) элемент</p>
+<p>Сейчас у нас есть модель, из которой мы можем получать данные от БД. В БД есть структура для хранения книг, но нет самих записей о книгах. Нам поможет админская учётка django, которая включена по умолчанию, а мы не отключали;)</p>
+<p>Мы должны создать учётную запись администратора: задать логин, пароль, e-mail для получения отчётов и всё такое.</p>
+<inline_code><shell_welcome>hw2$</shell_welcome> python manage.py createsuperuser<br/></inline_code>
+<p>Запустите сервер на порту 8080 и по адресу "localhost:8080/admin" вы попадёте на страницу, предназначенную для добавления, удаления и модификации объектов в базе данных. Только сейчас там нет и упоминания о книгах...</p>
+<p>Лезем в book_app и открываем admin.py:</p>
+<inline_code><m_title>hw2 / book_app / admin.py :</m_title><br/>
+from django.contrib import admin<br/>
+<hl>from .models import Books<br/><br/></hl>
+# Register your models here.<br/>
+<hl>admin.site.register(Books)</hl>
+</inline_code>
+<p>Теперь мы можем в графическом интерфейсе админки заносить данные по книгам. Обратите внимание на то, что мы не всю БД публикуем в админке, а только лишь отдельные таблицы.</p>
+<p>Напоминаю, что мы уже знаем, что такое вьюха, и знакомились с БД и моделями.</p>
+
+<h2>Hello World №3: параметризация вьюх и шаблоны</h2>
+<p>Книги в БД - это здорово. Хотелось бы отобразить их пользователю. Начнём мы, пожалуй, со странички каталога книг.</p>
+<p>Создаём проект hw3, приложение root_app. На этот раз приложение у нас будет одно, да несколько страничек будет определено в этом одном приложении.</p>
+<p>Создаём модель и таблицу в БД - Books, двух полей - author и title - будет достаточно. Через админку заносим три книги: [author_1]'book title 1', [author_2]'book title 2' и [author_3]'book title 3'</p>
+<p>В той директории, где лежат папки проекта и приложения создаём директорию templates, а в ней директорию root_app. И вот там уже будем создавать файл шаблона catalogue.html. Для того, чтобы нами созданная директория templates подхватывалась Django, необходимо в settings.py (hw3/hw3/) вставить одну строчку:</p>
+<img src="/static/tab_apps/django/html/text/templ_sett.png"></img>
+<p>В процессе создания шаблона будут использоваться запросы к модели. Напоминаю, что в HelloWorld №2 мы запускали консоль с доступом к модели.</p>
+<inline_code>
+<m_title>hw3 / templates / root_app / catalogue.html:</m_title><br/>
+<hl>{% if book_list %}<br/>
+&lt;ul&gt;<br/>
+{% for book in book_list %}<br/>
+<tab></tab>&lt;li&gt;{{book.author}} - {{book.title}}&lt;/li&gt;<br/>
+{% endfor %}<br/>
+&lt;/ul&gt;<br/>
+{% else %}<br/>
+&lt;p&gt;We have not any book.&lt;/p&gt;<br/>
+{% endif %}</hl>
+</inline_code>
+<p>Шаблон у нас есть. Теперь используем его в нашей вьюхе.</p>
+<inline_code><m_title>hw3 / root_app / views.py :</m_title><br/>
+from django.shortcuts import render<br/>
+<hl>from .models import Books<br/></hl><br/>
+# Create your views here.<br/>
+<hl>def index(request):<br/>
+<tab></tab>book_list = Books.objects.all();<br/>
+<tab></tab>context = {'book_list':book_list}<br/>
+<tab></tab>return render(request, 'root_app/catalogue.html', context)<hl/>
+</inline_code>
+<p>Ну вот. По адресу "localhost:8080" наблюдаем список тех книг, что завели в админке.</p>
+<p>Но названия книги не достаточно, чтобы пользователь мог определить, стоит ли ему тратиться на её приобретение или нет. Нам бы предоставить пользователю возможность узнать более подробную информацию по каждой книге в каталоге. Элементы списка в каталоге мы сделаем ссылками на страницы, на которых будет более подробная информация по книге. Сначала сделаем странички по книгам, и только потом укажем ссылки на полученные странички.</p>
+<p>Добавляем в БД таблицу book_details. Ограничимся одним полем - price.</p>
+<inline_code><m_title>hw3 / root_app / models.py :</m_title><br/>
+from __future__ import unicode_literals<br/><br/>
+from django.db import models<br/><br/>
+# Create your models here.<br/>
+class Books(models.Model):<br/>
+<tab></tab>author = models.CharField(max_length=200)<br/>
+<tab></tab>title = models.CharField(max_length=200)<br/>
+<tab></tab>def __str__(self):<br/>
+<tab></tab><tab></tab>return '[' /static/tab_apps/django/html/text/ self.author /static/tab_apps/django/html/text/ '] ' /static/tab_apps/django/html/text/ self.title<br/><br/>
+<hl>class BookDetails(models.Model):<br/>
+<tab></tab>book = models.ForeignKey(Books, on_delete=models.CASCADE)<br/>
+<tab></tab>price = models.IntegerField(default = 0)</hl>
+</inline_code>
+<p>Метод __str__ мы не переопределили, так что при отладке мы будем видеть неинформативное дефолтное строковое описание.</p>
+<p>Активируем наши изменения в модели</p>
+<inline_code><shell_welcome>hw3$</shell_welcome> python manage.py makemigrations root_app</inline_code>
+<inline_code><shell_welcome>hw3$</shell_welcome> python manage.py migrate</inline_code>
+<p>Пишем вьюху для отображения цены книги:</p>
+<inline_code><m_title>hw3 / root_app / views.py :</m_title><br/>
+from django.shortcuts import render<br/>
+<hl>from django.http import HttpResponse<br/></hl>
+from .models import Books<br/><br/>
+# Create your views here.<br/>
+def index(request):<br/>
+ <tab></tab>       book_list = Books.objects.all();<br/>
+ <tab></tab>      context = {'book_list':book_list}<br/>
+ <tab></tab>       return render(request, 'root_app/catalogue.html', context)<br/>
+<hl>def details(request, book_id):<br/>
+ <tab></tab>       return HttpResponse('You see details for book#' /static/tab_apps/django/html/text/ book_id)</hl>
+</inline_code><br/>
+<inline_code><m_title>hw3 / root_app / urls.py :</m_title><br/>
+from django.conf.urls import url<br/>
+from . import views<br/><br/>
+urlpatterns = [<br/>
+<tab></tab>url(r'^$', views.index, name='index'),<br/>
+<tab></tab><hl>url(r'^details/(?P&lt;book_id&gt;[0-9]/static/tab_apps/django/html/text/)$', views.details, name='details'),<br/></hl>
+]
+</inline_code>
+<p>Вот, что мы теперь можем видеть в браузере:<br/>
+ <tab></tab>localhost:8080 - наш каталог<br/>
+ <tab></tab>localhost:8080/details/1 - детальная информация (цена) по книге с id=1<br/>
+ <tab></tab>localhost:8080/details/2 - детальная информация (цена) по книге с id=2<br/>
+ <tab></tab>localhost:8080/details/3 - детальная информация (цена) по книге с id=3<br/>
+ <tab></tab>localhost:8080/details/1232123 - детальная информация (цена) по книге с id=1232123<br/>
+</p>
+<p>Что нам осталось сделать:</p>
+<ul><li>В каталоге сделать ссылки на страницы с подробной информацией</li><li>Сделать вывод подробной информации по книге согласно данным в БД</li></ul>
+<p>Идём в шаблон каталога, и делаем ссылки:</p>
+<inline_code><m_title> hw3 / templates / root_app / catalogue.html :</m_title><br/>
+{% if book_list %}<br/>
+&lt;ul><br/>
+{% for book in book_list %}<br/>
+<tab></tab><tab></tab>&lt;li><hl>&lt;a href="{% url 'details' book.id %}"></hl>{{book.author}} - {{book.title}}<hl>&lt;/a></hl>&lt;/li><br/>
+{% endfor %}<br/>
+&lt;/ul><br/>
+{% else %}<br/>
+&lt;p>We hasve not any book.&lt;/p><br/>
+{% endif %}
+</inline_code>
+<p>Делаем загрузку цены книги из БД:</p>
+<inline_code><m_title> hw3 / root_app / views.py :</m_title><br/>
+from django.shortcuts import render<br/>
+from django.http import HttpResponse<hl>, Http404</hl><br/>
+from .models import Books<hl>, BookDetails</hl><br/><br/>
+
+# Create your views here.<br/>
+def index(request):<br/>
+ <tab></tab>       book_list = Books.objects.all();<br/>
+ <tab></tab>       context = {'book_list':book_list}<br/>
+ <tab></tab>       return render(request, 'root_app/catalogue.html', context)<br/>
+def details(request, book_id):<br/>
+ <tab></tab>       <hl>#</hl>return HttpResponse('You see details for book#' /static/tab_apps/django/html/text/ book_id)<br/>
+ <tab></tab><hl>       try:<br/>
+ <tab></tab><tab></tab>               bookDetails = BookDetails.objects.get(book=book_id)<br/>
+ <tab></tab>       except BookDetails.DoesNotExist:<br/>
+ <tab></tab><tab></tab>               raise Http404('Details for this book does not exist')<br/>
+ <tab></tab>return HttpResponse('You see details for book#' /static/tab_apps/django/html/text/ book_id /static/tab_apps/django/html/text/ '&lt;br/>Price: %d rubley' %(bookDetails.price))</hl>
+</inline_code>
+<p>Сейчас при каждом запросе детальной информации о книге выводится, что странички нет ("Book does not exist"). Мы должны зарегистрировать модель BookDetails в hw3/root_app/admin.py(см. листиниг ниже), зайти в админку и добавить детальную информацию для каждой книги.</p>
+<inline_code><m_title>hw3 / root_app / admin.py :</m_title></br>
+from django.contrib import admin</br>
+from .models import Books<hl>, BookDetails</hl></br></br>
+# Register your models here.</br>
+admin.site.register(Books)</br>
+<hl>admin.site.register(BookDetails)</hl>
+</inline_code>
+
+<h2>Hello World №4: Пользовательский ввод (формы)</h2>
+<p>Давайте напишем простенькую программку, которая спрашивает пользователя, как его зовут, какой у него пол и сколько у него зубов, а затем напишем пользователю, как его зовут, какой у него пол и сколько у него зубов.</p>
+<p>Как обычно, создаём проект (hw4), добавляем приложение (root_app). Пишем шаблон спрашивающей странички question.html:</p>
+<inline_code><m_title> hw4 / templates / root_app / question.html :</m_title><br/><hl>
+&lt;form action="/post_data" method="post"><br/>
+ <tab></tab>{% csrf_token %}<br/>
+ <tab></tab>&lt;label for="name">Имя: &lt;/label><br/>
+ <tab></tab>&lt;input type="text" name="name" value="Абдурахман">&lt;br/><br/>
+ <tab></tab>&lt;label for="sex">Пол: &lt;/label><br/>
+ <tab></tab>&lt;input type="text" name="sex" value="Жунской">&lt;br/><br/>
+ <tab></tab>&lt;label for="teethcount">Число зубов: &lt;/label><br/>
+ <tab></tab>&lt;input type="text" name="teethcount" value="32">&lt;br/><br/>
+ <tab></tab>&lt;input type="submit" value="OK"><br/>
+&lt;/form>
+</hl></inline_code>
+<p>Строка '{% csrf_token %}' требуется только в том случае, когда производится POST-запрос, для GET-запросов эта строка не нужна</p>
+<p>Теперь пишем две вьюхи: с формой для ввода пользовательских данных и с ответной страничкой с введёнными пользователями данными.</p>
+<inline_code><m_title> hw4 / root_app / views.py :</m_title><br/>
+from django.shortcuts import render<br/>
+<hl>from django.http import HttpResponse</hl><br/><br/>
+# Create your views here.<br/>
+<hl>def index(request):<br/>
+ <tab></tab>return render(request, 'root_app/question.html')<br/>
+def post_data(request):<br/>
+ <tab></tab>name = '%r имеет пол %r и %r зубов' % (request.POST['name'], request.POST['sex'], request.POST['teethcount'])<br/>
+ <tab></tab>return HttpResponse(name)</hl><br/>
+</inline_code>
+<p>В зависимости от типа запроса, у request используется поле POST или GET.</p>
+<p>Наш urls.py в root_app будет выглядеть следующим образом:</p>
+<inline_code><m_title> hw4 / root_app / urls.py :</m_title><br/>
+<hl>from django.conf.urls import url<br/>
+from . import views<br/><br/>
+urlpatterns = [<br/>
+ <tab></tab>url(r'^post_data$', views.post_data, name='post_data'),<br/>
+ <tab></tab>url(r'^$', views.index, name='index'),<br/>
+]<hl/><br/>
+</inline_code>
+<p>Не забудьте добавить наше приложение в проект (hw4/hw4/), как мы это делали раньше.</p>
+<p>Ну вот, теперь мы умеем спрашивать у пользователя какие-то данные.</p>
+
+<h2>Hello World №5: Статические файлы</h2>
+<p>На реальных сайтах используются картинки, стили css, скрипты js. Вот такой контент и помещается в раздел так называемых статических файлов. Что отличает все вышеупомянутые файлы от, скажем, шаблонов, это то, что в результирующем коде указываются лишь ссылки на них. Сделаем простешее приложение, в котором используются файлы jpeg и css, а также установлена иконка странички.</p>
+<p>Как обычно, создаём проект hw5 и добавляем туда приложение 'root_app' с единственной страничкой в корне. Шаблон у нас будет выглядеть следующим образом:</p>
+<inline_code>
+{% load static %}<br/>
+&lt;!doctype html><br/>
+&lt;html><br/>
+&lt;head><br/>
+ <tab></tab>&lt;meta charset="utf-8"/><br/>
+ <tab></tab>&lt;title>Hello wold №5: Статические файлы&lt;/title><br/>
+ <tab></tab>&lt;link href="{% static 'root_app/favicon.ico' %}" rel="shortcut icon" type="image/x-icon" /><br/>
+ <tab></tab>&lt;link href="{% static 'root_app/style.css' %}" rel="stylesheet"/><br/>
+&lt;/head><br/>
+&lt;body><br/>
+ <tab></tab>&lt;h3>Урал Некст&lt;/h3><br/>
+ <tab></tab>&lt;img src="{% static 'root_app/ural_next.jpg' %}"/><br/>
+&lt;/body><br/>
+&lt;/html><br/>
+</inline_code>
+<p>Исходные бинарные файлы: <a href="/static/tab_apps/django/html/text/data/hw5/ural_next.jpg">картинка</a>, <a href="/static/tab_apps/django/html/text/data/hw5/favicon.ico">иконка</a>, <a href="/static/tab_apps/django/html/text/data/hw5/style.css">таблицы стилей</a>. </p>
+<p>Там же, где уже находится директория templates, создаём директорию static. Структура папки та же, что и у templates. Для того, чтобы наша папочка static подцеплялась, должны кое-что добавить в файл settings.py (в директории hw5/h5/):</p>
+<inline_code><m_title> hw5 / root_app / settings.py :</m_title><br/>
+# Static files (CSS, JavaScript, Images)<br/>
+# https://docs.djangoproject.com/en/1.11/howto/static-files/<br/><br/>
+STATIC_URL = '/static/'<br/><hl>
+STATICFILES_DIRS = [<br/>
+ <tab></tab>os.path.join(BASE_DIR, "static"),<br/>
+ <tab></tab>'/var/www/static/',<br/>
+]</hl>
+</inline_code>
+<p>Ну вот. Мы можем наблюдать страничку, в которой есть картинки и стили.</p>
+
+<h2>Hello World №6: Авторизация</h2>
+<p>Вот мы и подошли к очень интересной теме (наверное, самой интересной, ради которой стоит изучать Django) - аутентификации и авторизации пользователей на нашем сайте.</p>
+<p>Ключевым объектом аутентификации является класс User. Напоминаю, что в Hello World №2 мы уже регистрировали суперпользователя для доступа к админке нашего сайта. Сейчас мы займёмся вопросом аутентификации и авторизации обычных пользователей. Класс User храни тв себе следующие свойста:</p>
+• username <span style="color:#888;">(логин)</span><br/>
+• password <span style="color:#888;">(пароль)</span><br/>
+• email <span style="color:#888;">(адрес электронной почты)</span><br/>
+• first_name <span style="color:#888;">(реальное имя)</span><br/>
+• last_name <span style="color:#888;">(реальная фамилия)</span><br/>
+<p>Объект User - это сущность в модели, так что мы обязаны перед использованием сгенировать и применить скрипты "миграции".</p>
+<p>Самый простой способ зарегистрировать пользователя - вызвать функцию create_user():</p>
+<inline_code>
+<shell_welcome>>>></shell_welcome> from django.contrib.auth.models import User<br/>
+<shell_welcome>>>></shell_welcome> user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')<br/>
+ <span style="color:#888;"># Здесь пользователь представлен объектом User, который уже</span><br/>
+ <span style="color:#888;"># сохранён в БД. Вы можете задать дополнительные атрибуты</span><br/>
+ <span style="color:#888;"># (или изменить имеющиеся), если хотите. И сохранить изменения</span><br/>
+ <span style="color:#888;"># в модели (т.е. в БД) после модификации.</span><br/>
+<shell_welcome>>>></shell_welcome> user.last_name = 'Lennon'<br/>
+<shell_welcome>>>></shell_welcome> user.save()<br/>
+</inline_code>
+<p>Если пользователь <a href="https://ru.wikipedia.org/wiki/%D0%9F%D1%91%D1%81%D1%82%D1%80%D1%8B%D0%B5_%D0%B4%D1%8F%D1%82%D0%BB%D1%8B" target="_blank">ДЯТЕЛ</a>, и забыл свой пароль, мы можем задать новый пароль. Делается это следующим образом:</p>
+<inline_code>
+ <shell_welcome>>>></shell_welcome> from django.contrib.auth.models import User<br/>
+ <shell_welcome>>>></shell_welcome> u = User.objects.get(username='john')<br/>
+ <shell_welcome>>>></shell_welcome> u.set_password('new password')<br/>
+ <shell_welcome>>>></shell_welcome> u.save()
+</inline_code>
+<p>Ради чего требуется авторизация пользователя - для того, что определить, что можно показывать пользователю, а что нет (т.е. определение, к какой <i>группе</i> относится пользователь), а также для вывода информации, относящейся конкретно к пользователю (товары в корзине, сумма на счёте и всё такое). Мы не зря сказали про группу пользователей - все пользователи должны относиться к той или иной группе. К каждой группе пользователей и к каждому конкретному пользователю могут быть определены права (permissions) на доступ к чему-либо.</p>
+<p>Сейчас мы рассмотрим следующие вопросы, а затем уже приступим к написанию нашего <a href="#6.practice">мегапримера</a>:</p>
+<ul>
+<li><a href="#6.1">Форма входа на сайт</a></li>
+<li><a href="#6.2">Форма выхода с сайта</a></li>
+<li><a href="#6.3">Ограничение прав доступа к странице: только для авторизованных пользователей</a></li>
+<li><a href="#6.4">Ограничение прав доступа к странице: только для пользователей, имеющих определённые привилегии (permissions)</a></li>
+<li><a href="#6.5">Задание и определение привилегий пользователя</a></li>
+<li><a href="#6.6">Отправка писем пользователю на электронную почту</a></li>
+</ul>
+<h4><a name="6.1"></a>Форма входа на сайт</h4>
+<inline_code>
+from django.contrib.auth import authenticate, login<br/>
+def my_view(request):<br/>
+<tab></tab>username = request.POST['username']<br/>
+<tab></tab>password = request.POST['password']<br/>
+<tab></tab>user = authenticate(request, username=username, password=password)<br/>
+<tab></tab>if user is not None:<br/>
+ <tab></tab><tab></tab>login(request, user)<br/>
+ <tab></tab><tab></tab># Возвращаем страницу только что вошедшему пользователю.<br/>
+ <tab></tab><tab></tab>...<br/>
+ <tab></tab>else:<br/>
+ <tab></tab><tab></tab># Сообщаем пользователю, что логин-пароль не подошли.<br/>
+ <tab></tab><tab></tab>...<br/>
+</inline_code>
+<p>При аутентификации (authenticate()) по логину-паролю определяется пользователь. Просто определяется. При авторизации (login()) id пользователя сохраняется в БД в текущей сессии. После авторизации всем нашим вьюхам доступен объект User как поле передаваемого параметра(request.user).</p>
+<h4><a name="6.2"></a>Форма выхода с сайта</h4>
+<inline_code>
+from django.contrib.auth import logout<br/><br/>
+def logout_view(request):<br/>
+<tab></tab>logout(request)<br/>
+<tab></tab># Возвращаем страницу уже анонимному пользователю.<br/>
+</inline_code>
+<h4><a name="6.3"></a>Ограничение прав доступа к странице: только для авторизованных пользователей</h4>
+<p>Для проверки, авторизован ли пользователь, у объекта request.user имеется свойство is_authentificated. Вот пример адаптивного поведения вьюхи, зависящего от авторизованности пользователя:</p>
+<inline_code>
+from django.conf import settings<br/>
+from django.shortcuts import redirect</br></br>
+def my_view(request):<br/>
+<tab></tab>if not request.user.is_authentificated:<br/>
+<tab></tab><tab></tab>return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))<br/>
+<tab></tab><span style="color:#888"># ...</span>
+</inline_code>
+<p>То же самое можно записать короче, если использовать декоратор login_required:</p>
+<inline_code>
+from django.contrib.auth.decorators import login_required<br/><br/>
+@login_required<br/>
+def my_view(request):<br/>
+<tab></tab>...
+</inline_code>
+<p>Обращаем ваше внимание на то, что странице авторизации параметром передаётся текущий адрес страницы. Это нужно для того, чтобы после авторизации страница авторизации могла вернуть пользователя туда, откуда он был перенаправлен на страницу авторизации.</p>
+<p>Ну а если вы хотите не перенаправлять пользователя на страницу авторизации, а просто сообщить ему, что страница доступна только для авторизованных пользователей (например, такая ситуация возникает, когда вы отдаёте данные по AJAX), то код будет выглядеть следующим образом:</p>
+<inline_code>
+from django.shortcuts import render<br/><br/>
+def my_view(request):
+<tab></tab>if not request.user.is_authentificated:<br/>
+<tab></tab><tab></tab>return render(request, 'myapp/login_error.html')<br/>
+<tab></tab># ...
+</inline_code>
+<h4><a name="6.4"></a>Ограничение прав доступа к странице: только для пользователей, имеющих определённые привилегии (permissions)</h4>
+<p>Допустим, нам пользователь авторизовался. В нашем сервисе некий контент доступен только тем пользователям, у которых активна платная подписка, а только что авторизовавшийся пользователь не имеет активной платной подписки. Мы должны при попытке обратиться к платному контенту такого пользователя перехватить и перенаправить либо на страницу оформления подписки, либо (что куда гуманнее) просто выдать страницу с сообщением, что 'Данный контент доступен только при активной платной подписке'. В коде это выглядит как-то так:</p>
+<inline_code>
+from django.shortcuts import redirect<br/><br/>
+def my_view(request):<br/>
+<tab></tab>if not request.user.has_perm('Book.extra'):<br/>
+<tab></tab><tab></tab>return redirect('access_denied.html')<br/>
+<tab></tab># ...
+</inline_code>
+<p>Как альтернативный вариант: хранить в отдельной модели(т.е. таблице БД) данные о подписках для разных пользователей (по id), и проверять здесь, есть ли запись в той модели и не просрочена ли подписка.</p>
+<h4><a name="6.5"></a>Задание и определение привилегий пользователя</h4>
+<p>Следующий код позволяет задать привилегии пользователю. Не уверен, что вам он может понадобиться - механизм привилегий.</p>
+<inline_code>
+from myapp.models import BlogPost<br/>
+from django.contrib.auth.models import Permission<br/>
+from django.contrib.contenttypes.models import ContentType<br/><br/>
+content_type = ContentType.objects.get_for_model(BlogPost)<br/>
+permission = Permission.objects.create(<br/>
+ <tab></tab>codename='can_publish',<br/>
+ <tab></tab>name='Can Publish Posts',<br/>
+ content_type=content_type,<br/>
+)
+</inline_code>
+<h4><a name="6.6"></a>Отправка писем пользователю на электронную почту</h4>
+<p>Для отправки писем в Django есть функция "send_mail":</p>
+<inline_code>
+from django.core.mail import send_mail<br/><br/>
+send_mail(<br/>
+ <tab></tab>'Чистосердечное признание', <span style="color:#888;"># Тема соообщения</span><br/>
+ <tab></tab>'Пишу тебе ...', <span style="color:#888;"># HTML-код сообщения</span><br/>
+ <tab></tab>'from@example.com', <span style="color:#888;"># e-mail отправителя</span><br/>
+ <tab></tab>['to@example.com'], <span style="color:#888;"># Список 'Кому'</span><br/>
+)
+</inline_code>
+<h4><a name="6.practice"></a>Конец теории. Практика.</h4>
+<p>У нас накопилось достаточно знаний, чтобы забабахать что-нибудь эдакое, да с авторизацией и защитой контента от доступа неавторизованных пользователей. Одна проблема, решение которой не хотелось бы оставить без внимания, заключается в возвращении после авторизации туда, откуда пользователь был перенаправлен на страницу авторизации. Пусть перед пользователем будет текстовое поле, в котором пользователь перед авторизацией может что-то ввести, тогда при возвращении из авторизации пользователь должен увидеть введённый ранее текст.</p>
+<p>В общем виде состояние страницы можно описать в одной переменной типа Object, который мы можем преобразовать в текстовую стоку (JSON.stringify(myObject)) и передать на сервер.</p>
+<p>Как обычно создаём проект hw6, добавляем приложение 'root_app'. Создаём папки templates и static. В каждой из этих папок создаём по папке root_app, отныне когда я буду говорить про папки шаблонов или статических файлов, я буду иметь в виду папки root_app. Сразу прописываем в settings.py следующие вещи:</p>
+<inline_code><m_title>hw6 / hw6 / settings.py :</m_title><br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+ROOT_URLCONF = 'hw6.urls'<br/><br/>
+TEMPLATES = [<br/>
+ <tab></tab>   {<br/>
+ <tab></tab><tab></tab>           'BACKEND': 'django.template.backends.django.DjangoTemplates',<br/>
+ <tab></tab><tab></tab>           'DIRS': [<hl>os.path.join(BASE_DIR, 'templates')</hl>],<br/>
+ <tab></tab><tab></tab>           'APP_DIRS': True,<br/>
+ <tab></tab><tab></tab>           'OPTIONS': {<br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+ STATIC_URL = '/static/'<br/>
+ <hl>STATICFILES_DIRS = [<br/>
+ <tab></tab>os.path.join(BASE_DIR, "static"),<br/>
+ <tab></tab>'/var/www/static/',<br/>
+ ]</hl>
+</inline_code>
+<p>Сразу положим себе файлы подготовленных мною заготовок. Файлы <a href="/static/tab_apps/django/html/text/data/hw6/favicon.ico" download>favicon.ico</a>, <a href="/static/tab_apps/django/html/text/data/hw6/b.js" download>b.js</a> и <a href="/static/tab_apps/django/html/text/data/hw6/lineinput.js" download>lineinput.js</a> помещаем в папку для статических файлов, а файлы <a href="/static/tab_apps/django/html/text/data/hw6/index.html" download>index.html</a> и <a href="/static/tab_apps/django/html/text/data/hw6/login.html" download>login.html</a> кладём в папку для шаблонов.</p>
+<p>Делаем так, чтобы при попадании на наш адрес (localhost:8080), пользователь видел страницу, которая сейчас лежит у нас в шаблонах под именем index.html</p>
+<inline_code><m_title>hw6 / hw6 / urls.py :</m_title><br/>
+from django.conf.urls import url<hl>, include</hl><br/>
+from django.contrib import admin<br/><br/>
+urlpatterns = [<br/>
+<hl> <tab></tab>url(r'^', include('root_app.urls')),</hl><br/>
+ <tab></tab>url(r'^admin/', admin.site.urls),<br/>
+]
+</inline_code><br/>
+<inline_code><m_title>hw6 / root_app / urls.py :</m_title><br/>
+<hl>from django.conf.urls import url<br/>
+from . import views<br/><br/>
+urlpatterns = [<br/>
+ <tab></tab>url(r'^$', views.index, name='index'),<br/>
+]</hl>
+</inline_code><br/>
+<inline_code><m_title>hw6 / root_app / views.py :</m_title><br/>
+from django.shortcuts import render<br/><br/>
+# Create your views here.<br/>
+<hl>def index(request):<br/>
+ <tab></tab>return render(request, 'root_app/index.html')</hl>
+</inline_code><br/>
+<inline_code><shell_welcome>hw6$</shell_welcome> python manage.py migrate</inline_code>
+<p>Сейчас можно уже запустить сервер, и посмотреть что получается на выходе. Запускать надо из отдельной консоли.</p>
+<inline_code><shell_welcome>hw6$</shell_welcome> python runserver 8080</inline_code>
+<p>Когда будете смотреть результат работы по адресу "localhost:8080", нажмите на клавиатуре <span style="padding:2px;border:1px solid #888;border-radius: 5px;">Ctrl /static/tab_apps/django/html/text/ Shift /static/tab_apps/django/html/text/ I</span> - должна отобразиться консоль браузера. Там обычно вмого вкладок, и консоль - одна из них. Так вот, если вы посмотрите в консоль нашей корневой странички, то увидите, что произошла ошибка выполнения JavaScript-скрипта на странице:</p>
+<inline_code>ReferenceError: B is not defined</inline_code>
+<p>Это оттого, что пути к скриптам жёстко зашиты в шаблоне, и браузер их по указанному адресу не находит. Так что идём в текст шаблона и правим данное недоразумение:</p>
+<inline_code><m_title>hw6 / templates / root_app / index.html :</m_title><br/>
+<hl>{% load static %}</hl><br/>
+&lt;!doctype html><br/>
+&lt;html><br/>
+&lt;head><br/>
+&lt;meta charset="UTF-8"><br/>
+&lt;title><hl>Hello World №6</hl>&lt;/title><br/>
+&lt;link href="<hl>{% static 'root_app/</hl>favicon.ico<hl>' %}</hl>" rel="shortcut icon" type="image/x-icon" /><br/>
+&lt;script src="<hl>{% static 'root_app/</hl>b.js<hl>' %}</hl>">&lt;/script><br/>
+&lt;script src="<hl>{% static 'root_app/</hl>lineinput.js<hl>' %}</hl>">&lt;/script><br/>
+&lt;/head><br/>
+&lt;body><br/>
+&lt;div id="lineinput">&lt;/div><br/><br/>
+&lt;div id="debug_widget">&lt;/div><br/>
+&lt;p>Вы авторизованы как СЛОН&lt;/p><br/>
+&lt;a href="logout.html">Выйти&lt;/a><br/>
+&lt;p>Вы не авторизованы&lt;/p><br/>
+&lt;a href="login.html">Войти&lt;/a><br/>
+&lt;script><br/>
+var doc = {userText:"initial text"};<br/>
+var statePublisher = new B.StatePublisher();<br/>
+statePublisher.setState(doc);<br/><br/>
+statePublisher.registerSubscriber(new LineInput("lineinput"));<br/>
+statePublisher.registerSubscriber(new B.StateDebugWidget("debug_widget"));<br/>
+<&lt;/script><br/>
+<&lt;/body><br/>
+<&lt;/html>
+</inline_code>
+<p>Исходная стартовая (корневая) страница index.html сделана так, как это возможно при разработке веб-страницы в файловой системе (писал в Windows на Notepad/static/tab_apps/django/html/text/, проверял, открывая этот файл в браузере). Сейчас мы адаптировали эту страницу (теперь уже шаблон) для использования на сервере Django.</p>
+<p>Давайте посмотрим на ту страницу, что перед нами. Страница представляет собой поле ввода текстовой строки с кнопкой "Применить", отладочная область(текстовая область и кнопка "Apply JSON"), текстовая строка, отображающая текущего пользователя, и ссылка на страницу авторизации (или выхода, если пользователь уже в системе). Отладочная область отображает текстовое представление состояния нашей корневой страницы - это состояние мы по возвращении обратно на эту страницу должны будем установить. А сейчас мы подкорректируем наш шаблон так, чтобы он отображал нам, что мы не авторизованы.</p>
+<inline_code><m_title>hw6 / root_app / views.py :</m_title><br/>
+from django.shortcuts import render<br/><br/>
+# Create your views here.<br/>
+def index(request):<br/>
+<tab></tab><hl>context = {'login_ok':request.user.is_authenticated}</hl><br/>
+ <tab></tab>return render(request, 'root_app/index.html'<hl>, context</hl>)
+</inline_code><br/>
+<inline_code><m_title>hw6 / templates / root_app / index.html :</m_title><br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+<hl> {% if login_ok %}</hl><br/>
+&lt;p>Вы авторизованы как СЛОН&lt;/p><br/>
+&lt;a href="logout.html">Выйти&lt;/a><br/>
+<hl>{% else %}</hl><br/>
+&lt;p>Вы не авторизованы&lt;/p><br/>
+&lt;a href="gin.html">Войти&lt;/a><br/>
+<hl>{% endif %}</hl><br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+</inline_code>
+<p>Теперь добавляем имя пользователя для отображения в случае, если пользователь авторизован:</p>
+<inline_code><m_title>hw6 / root_app / views.py :</m_title><br/>
+from django.shortcuts import render<br/><br/>
+# Create your views here.<br/>
+def index(request):<br/>
+<tab></tab>context = {'login_ok':request.user.is_authenticated}<br/>
+<tab></tab><hl>if request.user.is_authenticated:<br/>
+<tab></tab><tab></tab>context['username'] = '%s %s' % (request.user.last_name, request.user.first_name)</hl><br/>
+ <tab></tab>return render(request, 'root_app/index.html', context)
+</inline_code><br/>
+<inline_code><m_title>hw6 / templates / root_app / index.html :</m_title><br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+{% if login_ok %}<br/>
+&lt;p>Вы авторизованы как <hl>{{username}}</hl>&lt;/p><br/>
+&lt;a href="logout.html">Выйти&lt;/a><br/>
+{% else %}<br/>
+&lt;p>Вы не авторизованы&lt;/p><br/>
+&lt;a href="gin.html">Войти&lt;/a><br/>
+{% endif %}<br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+</inline_code>
+<p>Да, кстати! При такой реализации, чтобы увидеть своё имя надо его задать - для вывода используется не ЛОГИН, а именно что фамилия и имя (которые являются необязательными для задания). Я зашёл на корневую страничку - "Вы не авторизованы". Захожу на отдельной вкладке в админку, логинюсь как админ. Обновляю вкладку с корневой страничкой - "Вы авторизованы как Админыч Админ". Ура! Ну а сейчас мы идём дальше - нам надо сделать работающей ссылку "Войти", чтобы для авторизации на сайте не надо было лезть в админку..</p>
+<p>Авторизоваться мы будем по адресу &lt;наш домен> / accounts / login . Пишем ссылку, пишем вьюху:</p>
+<inline_code><m_title>hw6 / templates / root_app / index.html :</m_title><br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+&lt;p>Вы не авторизованы&lt;/p><br/>
+&lt;a href="<hl>accounts/</hl>login.html">Войти&lt;/a><br/>
+{% endif %}<br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+</inline_code><br/>
+<inline_code><m_title>hw6 / root_app / views.py :</m_title><br/>
+from django.shortcuts import render<br/><br/>
+# Create your views here.<br/>
+def index(request):<br/>
+<tab></tab>context = {'login_ok':request.user.is_authenticated}<br/>
+ <tab></tab>return render(request, 'root_app/index.html', context)<br/>
+<hl> def login(request):<br/>
+<tab></tab>return render(request, 'root_app/login.html')</hl>
+</inline_code><br/>
+<inline_code><m_title>hw6 / root_app / urls.py :</m_title><br/>
+from django.conf.urls import url<br/>
+from . import views<br/><br/>
+urlpatterns = [<br/>
+<tab></tab>url(r'^$', views.index, name='index'),<br/>
+<tab></tab><hl>url(r'^accounts/login', views.login, name='login')</hl><br/>
+]
+</inline_code>
+<p>Вот ссылка "Войти" теперь нас перенаправляет на страницу авторизации. Опять у нас сломалось - нет иконки странички (favicon.ico) - исправляем:</p>
+<inline_code><m_title>hw6 / templates / root_app / login.html :</m_title><br/>
+<hl>{% load static %}</hl><br/>
+&lt;!doctype html><br/>
+&lt;html><br/>
+&lt;head><br/>
+&lt;meta charset="UTF-8"><br/>
+&lt;title><hl>Hello World №6. Авторизация.</hl>&lt;/title><br/>
+&lt;link href="<hl>{% static 'root_app/</hl>favicon.ico<hl>'%}</hl>" rel="shortcut icon" type="image/x-icon" /><br/>
+&lt;style><br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+</inline_code>
+<p>Сейчас мы должны настроить нашу форму так, чтобы она отсылала на сервер (по тому же адресу, по которому была загружена) логин и пароль пользователя. Не забываем про шифрование данных (CSRF token). Пока мы не учитываем то обстоятельство, что нам надо будет вернуться на ту страницу, с которой ушли на авторизацию.</p>
+<inline_code><m_title>hw6 / templates / root_app / login.html :</m_title><br/>
+{% load static %}<br/>
+&lt;!doctype html><br/>
+&lt;html><br/>
+&lt;head><br/>
+&lt;meta charset="UTF-8"><br/>
+&lt;title>Hello World №6. Авторизация.&lt;/title><br/>
+&lt;link href="{% static 'root_app/favicon.ico'%}" rel="shortcut icon" type="image/x-icon" /><br/>
+&lt;style><br/>
+body{<br/>
+<tab></tab>        background:#024;<br/>
+ <tab></tab>       text-align: center;<br/>
+}<br/>
+form{<br/>
+ <tab></tab>       margin-top:200px;<br/>
+ <tab></tab>       width:300px;<br/>
+ <tab></tab>       height:128px;<br/>
+ <tab></tab>       border: 4px solid #fff;<br/>
+ <tab></tab>       border-radius:10px;<br/>
+ <tab></tab>       background:#ffa;<br/>
+ <tab></tab>       color:#004;<br/>
+ <tab></tab>       display: inline-block;<br/>
+}<br/>
+form table{<br/>
+ <tab></tab>       padding:20px;<br/>
+}<br/>
+&lt;/style><br/>
+&lt;/head><br/>
+&lt;body><br/>
+&lt;form<hl> action="" method="post"</hl>><br/>
+<hl>{% csrf_token %}</hl><br/>
+&lt;table width="100%" height="100%"><br/>
+&lt;tr><br/>
+&lt;td>&lt;label for="login">Логин: &lt;/label>&lt;/td><br/>
+&lt;td>&lt;input style="width:100%" type="text" name="<hl>login</hl>">&lt;/td><br/>
+&lt;/tr><br/>
+&lt;tr><br/>
+&lt;td>&lt;label for="password">Пароль: &lt;/label>&lt;/td><br/>
+&lt;td>&lt;input style="width:100%" type="password" name="<hl>password</hl>">&lt;/td><br/>
+&lt;/tr><br/>
+&lt;tr><br/>
+&lt;td colspan="2">&lt;input style="width:100%" type="submit" value="Войти">&lt;/td><br/>
+&lt;/tr><br/>
+&lt;/table><br/>
+&lt;/form><br/>
+&lt;/body><br/>
+&lt;/html><br/>
+</inline_code>
+<p>Так как данные мы отослали по тому же адресу, на котором и находились (страница авторизации), после нажатия кнопки "Войти" пользователь ничего интересного не увидит... Теперь надо принять данные и перенаправить пользователя на нужную страницу:</p>
+<inline_code><m_title>hw6 / root_app / views.py :</m_title><br/>
+<hl>from django.contrib.auth import authenticate, login</hl><br/>
+from django.shortcuts import render<hl>, redirect</hl><br/><br/>
+# Create your views here.<br/>
+def index(request):<br/>
+ <tab></tab>       context = {'login_ok':request.user.is_authenticated}<br/>
+ <tab></tab>       if request.user.is_authenticated:<br/>
+ <tab></tab><tab></tab>               context['username'] = '%s %s' % (request.user.last_name, request.user.first_name)<br/>
+ <tab></tab>       return render(request, 'root_app/index.html', context)<br/>
+def login(request):<br/>
+<hl>  <tab></tab>      if request.method == 'POST':<br/>
+ <tab></tab><tab></tab>               username = request.POST['login']<br/>
+ <tab></tab><tab></tab>               password = request.POST['password']<br/>
+ <tab></tab><tab></tab>               user = authenticate(request, username=username, password=password)<br/>
+ <tab></tab><tab></tab>               if user is not None:<br/>
+ <tab></tab><tab></tab><tab></tab>                       # мы определили пользователя. Авторизуем его.<br/>
+ <tab></tab><tab></tab><tab></tab>                       login(request, user)<br/>
+ <tab></tab><tab></tab><tab></tab>                       # возвращаем пользователя туда, где был<br/>
+ <tab></tab><tab></tab><tab></tab>                       return redirect('index')<br/>
+ <tab></tab><tab></tab><tab></tab>                       # неверная пара логин-пароль<br/>
+ <tab></tab><tab></tab><tab></tab>                       # не выходим - значит остаёмся на странице авторизации<br/></hl>
+
+ <tab></tab>       return render(request, 'root_app/login.html')<br/>
+
+</inline_code>
+<p>Смотрим, что будет, если попробовать залогиниться. Упс... Ошибка (<span style="color:#888"> login() takes 1 positional argument but 2 were given</span>). Так получилось, что имя нашей вьюхи (login) совпало с именем системной функции авторизации. Варианта два: либо переименовать нашу вьюху (опять лезть в urls.py ...), либо импортировать функцию login под псевдонимом (например, auth_login). Пойдём вторым путём:</p>
+<inline_code><m_title>hw6 / root_app / views.py :</m_title><br/>
+from django.contrib.auth import authenticate, login as <hl>auth_</hl>login<br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+<tab></tab><tab></tab> <hl>auth_</hl>login(request, user)<br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+</inline_code>
+<p>Тестируем. Заходим на нашу корневую страничку (localhost:8080), видим, что не авторизованы. Жмём "Войти". Попадаем на форму авторизации. Вводим свои логин-пароль. Жмём "Войти". Та-Дам! Мы на корневой страничке, только на этот раз мы уже авторизованы (!!). Чтобы разлогиниться нам ещё нужно идти в админку...</p>
+<p>Прошу обратить внимание на такое дело. Во-первых, мы захардкодили стартовую страничку, т.е. откуда бы пользователь ни уходил в авторизацию, вернётся он всегда на стартовую страницу, а это косяк. Во-вторых, если вы перед авторизацией введёте строку, нажмёте "Применить", после авторизации вы вернётесь на исходную страничку с дефолтным текстом в текстовом поле - наше веб-приложение не сохранило своё состояние - косяк. Косяки надо исправлять. Нам надо пронести через авторизацию (1) адрес исходной страницы и (2) состояние исходной страницы.</p>
+<p>Переход на страницу авторизации должен сопровождаться двумя параметрами: адрес исходной страницы и состояние исходной страницы. Назовём эти параметры next и state соответственно:</p>
+<inline_code><m_title>hw6 / templates / root_app / index.html :</m_title><br/>
+yy <tab></tab><span style="color:#888">. . .</span><br/>
+&lt;p>Вы не авторизованы&lt;/p><br/>
+&lt;a <hl>id="login_link" href=""</hl>>Войти&lt;/a><br/>
+{% endif %}<br/>
+&lt;script><br/>
+var doc = {userText:"initial text"};<br/>
+var statePublisher = new B.StatePublisher();<br/>
+statePublisher.setState(doc);<br/><br/>
+
+statePublisher.registerSubscriber(new LineInput("lineinput"));<br/>
+statePublisher.registerSubscriber(new B.StateDebugWidget("debug_widget"));<br/><br/>
+
+<hl>var loginBaseUrl = 'accounts/login.html';<br/>
+function StateInLinkSaver(){<br/>
+}<br/>
+StateInLinkSaver.prototype = Object.create(B.StateSubscriber);<br/>
+StateInLinkSaver.prototype.constructor = StateInLinkSaver;<br/>
+StateInLinkSaver.prototype.processStateChanges = function(s){<br/>
+ <tab></tab>       var eLink = document.getElementById('login_link');<br/>
+ <tab></tab>       if (!eLink)<br/>
+ <tab></tab><tab></tab>               return;<br/>
+ <tab></tab>       eLink.href = loginBaseUrl /static/tab_apps/django/html/text/ '?' /static/tab_apps/django/html/text/ 'next=' /static/tab_apps/django/html/text/ encodeURIComponent('/') /static/tab_apps/django/html/text/ '&state=' /static/tab_apps/django/html/text/ encodeURIComponent(JSON.stringify(s));<br/>
+ <tab></tab>       console.log(eLink.href);<br/>
+}<br/>
+statePublisher.registerSubscriber(new StateInLinkSaver());</hl><br/>
+&lt;/script><br/>
+&lt;/body><br/>
+&lt;/html>
+</inline_code><br/>
+<inline_code><m_title>hw6 / templates / root_app / login.html :</m_title><br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+&lt;td colspan="2"><br/>
+ <hl><tab></tab>       &lt;input id="field_next" style="display:none" type="text" name="next"/><br/>
+ <tab></tab>       &lt;input id="field_state" style="display:none" type="text" name="state"/></hl><br/>
+ <tab></tab>       &lt;input style="width:100%" type="submit" value="Войти"/><br/>
+&lt;/td><br/>
+&lt;/tr><br/>
+&lt;/table><br/>
+&lt;/form><br/>
+<hl>&lt;script><br/>
+var params = window.location.search.replace('?','').split('&').reduce(<br/>
+ <tab></tab>       function(p,e){<br/>
+ <tab></tab><tab></tab>               var a = e.split('=');<br/>
+ <tab></tab><tab></tab>               p[ decodeURIComponent(a[0])] = decodeURIComponent(a[1]);<br/>
+ <tab></tab><tab></tab>               return p;<br/>
+ <tab></tab>       },<br/>
+ <tab></tab>       {}<br/>
+);<br/>
+document.getElementById('field_next').value = params['next'];<br/>
+document.getElementById('field_state').value = params['state'];<br/>
+&lt;/script></hl><br/>
+&lt;/body><br/>
+&lt;/html>
+</inline_code><br/>
+<inline_code><m_title>hw6 / root_app / views.py :</m_title><br/>
+from django.contrib.auth import authenticate, login as auth_login<br/>
+from django.shortcuts import render, redirect<br/><br/>
+# Create your views here.<br/>
+def index(request):<br/>
+ <tab></tab>       context = {'login_ok':request.user.is_authenticated}<br/>
+ <tab></tab>       if request.user.is_authenticated:<br/>
+ <tab></tab><tab></tab>               context['username'] = '%s %s' % (request.user.last_name, request.user.first_name)<br/>
+ <tab></tab>       return render(request, 'root_app/index.html', context)<br/>
+def login(request):<br/>
+ <tab></tab>       if request.method == 'POST':<br/>
+ <tab></tab><tab></tab>               username = request.POST['login']<br/>
+ <tab></tab><tab></tab>               password = request.POST['password']<br/>
+ <tab></tab><tab></tab>               user = authenticate(request, username=username, password=password)<br/>
+ <tab></tab><tab></tab>               if user is not None:<br/>
+ <tab></tab><tab></tab><tab></tab>                       # мы определили пользователя. Авторизуем его.<br/>
+ <tab></tab><tab></tab><tab></tab>                       auth_login(request, user)<br/>
+ <tab></tab><tab></tab><tab></tab>                       # возвращаем пользователя туда, где был<br/>
+ <tab></tab><tab></tab><tab></tab>               <hl>pNext = request.POST['next']<br/>
+ <tab></tab><tab></tab><tab></tab>               pState = request.POST['state']</hl><br/>
+ <tab></tab><tab></tab><tab></tab>                       return redirect(<hl>'%s?state=%s' % (pNext, pState)</hl>)<br/>
+ <tab></tab>       return render(request, 'root_app/login.html')<br/>
+</inline_code>
+<p>Ну вот, по возвращении на исходную страницу мы имеем переданное параметром состояние страницы - осталось только это состояние применить.</p>
+<p>Для того, чтобы применить переданное парметром страницы состояние, чуть-чуть модифицируем наши действия с инициализацией B.StatePublisher-а - если параметр параметром в адресе не указан, устанавливаем дефолтное значение, если указан - читаем и устанавливаем его:</p>
+<inline_code><m_title>hw6 / templates / root_app / index.html :</m_title><br/>
+{% load static %}<br/>
+&lt;!doctype html><br/>
+&lt;html><br/>
+&lt;head><br/>
+&lt;meta charset="UTF-8"><br/>
+&lt;title>Hello World №6&lt;/title><br/>
+&lt;link href="{% static 'root_app/favicon.ico' %}" rel="shortcut icon" type="image/x-icon" /><br/>
+&lt;script src="{% static 'root_app/b.js' %}">&lt;/script><br/>
+&lt;script src="{% static 'root_app/lineinput.js' %}">&lt;/script><br/>
+&lt;/head><br/>
+&lt;body><br/>
+&lt;div id="lineinput">&lt;/div>&lt;br/><br/>
+&lt;div id="debug_widget">&lt;/div><br/>
+{% if login_ok %}<br/>
+&lt;p>Вы авторизованы как {{username}}&lt;/p><br/>
+&lt;a href="logout.html">Выйти&lt;/a><br/>
+{% else %}<br/>
+&lt;p>Вы не авторизованы&lt;/p><br/>
+&lt;a id="login_link" href="">Войти&lt;/a><br/>
+{% endif %}<br/>
+&lt;script><br/>
+<hl>function getUrlVars() {<br/>
+<tab></tab>        var vars = {};<br/>
+ <tab></tab>       var parts = window.location.href.replace(/[?&]/static/tab_apps/django/html/text/([^=&]/static/tab_apps/django/html/text/)=([^&]*)/gi, function(m,key,value) {<br/>
+ <tab></tab><tab></tab>               vars[key] = value;<br/>
+ <tab></tab>       });<br/>
+ <tab></tab>       return vars;<br/>
+}<br/>
+var state;// = {userText:"initial text"};<br/>
+var windowParams = getUrlVars();<br/>
+if (windowParams.hasOwnProperty('state'))<br/>
+ <tab></tab>       state = JSON.parse(decodeURIComponent(windowParams.state));<br/>
+else<br/>
+ <tab></tab>       state = {userText: "initial text"};<br/>
+var statePublisher = new B.StatePublisher();<br/>
+statePublisher.setState(state);</hl><br/><br/>
+
+statePublisher.registerSubscriber(new LineInput("lineinput"));<br/>
+statePublisher.registerSubscriber(new B.StateDebugWidget("debug_widget"));<br/><br/>
+
+var loginBaseUrl = 'accounts/login.html';<br/>
+function StateInLinkSaver(){<br/>
+}<br/>
+StateInLinkSaver.prototype = Object.create(B.StateSubscriber);<br/>
+StateInLinkSaver.prototype.constructor = StateInLinkSaver;<br/>
+StateInLinkSaver.prototype.processStateChanges = function(s){<br/>
+ <tab></tab>       var eLink = document.getElementById('login_link');<br/>
+ <tab></tab>       if (!eLink)<br/>
+ <tab></tab><tab></tab>               return;<br/>
+ <tab></tab>       eLink.href = loginBaseUrl /static/tab_apps/django/html/text/ '?' /static/tab_apps/django/html/text/ 'next=' /static/tab_apps/django/html/text/ encodeURIComponent('/') /static/tab_apps/django/html/text/ '&state=' /static/tab_apps/django/html/text/ encodeURIComponent(JSON.stringify(s));<br/>
+ <tab></tab>       console.log(eLink.href);<br/>
+}<br/>
+statePublisher.registerSubscriber(new StateInLinkSaver());<br/>
+&lt;/script><br/>
+&lt;/body><br/>
+&lt;/html>
+</inline_code>
+<p>Делаем работающей ссылку "Выйти".</p>
+<p>Прописываем адрес ссылки на нашу страницу разлогинирования - "/accounts/logout". Мы, как и в случае с логиниванием, должны передать адрес возврата (адрес текущей страницы) и состояние страницы, а также указать параметр, что пользователь желает выйти из систем. </p>
+<inline_code><m_title>hw6 / templates / root_app / index.html :</m_title><br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+&lt;a <hl>id="logout_link" href=""</hl>>Выйти&lt;/a><br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+var loginBaseUrl = 'accounts/login.html';<br/>
+<hl>var logoutBaseUrl = 'accounts/logout.html';</hl><br/>
+function StateInLinkSaver(){<br/>
+}<br/>
+StateInLinkSaver.prototype = Object.create(B.StateSubscriber);<br/>
+StateInLinkSaver.prototype.constructor = StateInLinkSaver;<br/>
+StateInLinkSaver.prototype.processStateChanges = function(s){<br/>
+ <tab></tab>       var e<hl>Login</hl>Link = document.getElementById('login_link');<br/>
+ <tab></tab>       <hl>var eLogoutLink = document.getElementById('logout_link');<br/>
+    <tab></tab>var parameterString = '?' /static/tab_apps/django/html/text/ 'next=' /static/tab_apps/django/html/text/ encodeURIComponent('/') /static/tab_apps/django/html/text/ '&state=' /static/tab_apps/django/html/text/ encodeURIComponent(JSON.stringify(s));<br/>
+ <tab></tab>       if (eLoginLink)<br/>
+ <tab></tab><tab></tab>               eLoginLink.href = loginBaseUrl /static/tab_apps/django/html/text/ parameterString;<br/>
+ <tab></tab>       if (eLogoutLink)<br/>
+ <tab></tab><tab></tab>               eLogoutLink.href = logoutBaseUrl /static/tab_apps/django/html/text/ parameterString;</hl><br/>
+}<br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+
+</inline_code>
+<p>Прописываем вьюху логаута:</p>
+<inline_code><m_title>hw6 / root_app / views.py :</m_title><br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+<hl>def logout(request):<br/>
+ <tab></tab>       pNext = request.GET['next']<br/>
+ <tab></tab>       pState = request.GET['state']<br/><br/>
+ <tab></tab>       auth_logout(request)<br/>
+ <tab></tab>       return redirect('%s?state=%s' % (pNext, pState))</hl><br/>
+</inline_code>
+<p>Теперь у нас получилось вполне законченное веб-приложение, в которое мы можем входить и выходить.</p>
+<video src="/static/tab_apps/django/html/text/data/hw6/hw6.mp4" controls>dfg</video>
+
+<h2>Немного теории: Безопасность и шифрование</h2>
+<p>Тут используются страшные слова "сессия" и "AJAX", которые будут описаны позднее в HelloWorld №7. К сожалению, данный материал должен быть изложен ранее, так что просто сильно не огорчаемся, если не совсем понимаем, о чём идёт речь.</p>
+<p>Что нужно предусмотреть для того, чтобы обезопасить контент от несанкционированного доступа:</p>
+<ul>
+<li>Не забыть выключить режим отладки перед публикацией</li>
+<li>Защита от межсайтового скриптинга (XSS)</li>
+<li>Защита от подделки межсайтового запроса (CSRF)</li>
+<li>Защита от внедрения SQL</li>
+<li>Защита от скликивания</li>
+<li>Использование протокола HTTPS</li>
+<li>Проверка заголовка хоста (ALLOWED_HOSTS)</li>
+<li>Код вашего приложения должен находиться вне корня веб сервера. Это не позволит случайно отобразить его в виде текста или выполнить его</li>
+<li>Храните содержимое параметра SECRET_KEY в секрете</li>
+<li>Django не ограничивает количество запросов при аутентификации пользователей. Для того, чтобы защититься от перебора логина/пароля, вы можете поставить дополнительное приложение для Django или модуль для веб сервера, чтобы ограничивать такие запросы</li>
+<li>Старайтесь использовать формы Django вместо своих кустарных форм (как, например, у нас в HelloWorld №4 и HelloWorld №6). Формы Django будут рассмотрены ниже (HelloWorld №8, см. Содержание)</li>
+</ul>
+<p>Разработчики Django позаботились о том, чтобы мы, как разработчики веб-приложений, имели возможность не изобретать велосипед, а использовать готовые решения в области безопасности. Если посмотрите в файл settings.py вашего проекта, то увидите следующее в разделе MIDDLEWARE (конфигурация по умолчанию):</p>
+<inline_code>
+MIDDLEWARE = [<br/>
+ <tab></tab>   'django.middleware.security.SecurityMiddleware',<br/>
+ <tab></tab>   'django.contrib.sessions.middleware.SessionMiddleware',<br/>
+ <tab></tab>   'django.middleware.common.CommonMiddleware',<br/>
+ <tab></tab>   'django.middleware.csrf.CsrfViewMiddleware',<br/>
+ <tab></tab>   'django.contrib.auth.middleware.AuthenticationMiddleware',<br/>
+ <tab></tab>   'django.contrib.messages.middleware.MessageMiddleware',<br/>
+ <tab></tab>   'django.middleware.clickjacking.XFrameOptionsMiddleware',<br/>
+]
+</inline_code>
+<p>Основная работа по обеспечению безопасности уже включена в ваш проект. Рассмотрим теперь те моменты, которые надо учитывать разработчику, и те меры, которые разработчик должен принимать самостоятельно для обеспечения безопасности своего веб-приложения.</p>
+<p>Защита от межсайтового скриптинга (XSS). Этот вид атаки предполагает ввод пользователем данных вроде "... &lt;script>...&lt;/script> ..." в поле ввода, с тем, чтобы этот текст был сохранён и позднее был подставлен в шаблон Django. Хотя шаблоны Django экранируют спецсимволы, XSS-инъекция может быть и без спецсимволов - разработчик веб-приложения на Django должен контролировать соответствие введённого пользователем текста тому формату, который ожидает разработчик. Вот пример XSS-инъекции, которая не блокируется встроенными средствами защиты Django: &lt;style class="{{ var }}">...&lt;/style>, где var = 'class1 onmouseover=javascript:func()'.</p>
+<p>Защита от подделки межсайтового запроса (CSRF). Мудрёно сказано. Есть такой вид атаки - некто отсылает запрос на наш сервер с HTTP-заголовком, заимствованным от другого пользователя. Т.е. Вася запрашивает у нас данные, при этом в запросе подписывается именем Пети. Чтобы исключить возможность встраивания в чужие сессии посторонних пользователей, мы должны в заголовки HTTP-запросов встраивать зашифрованный идентификатор сессии (используется, SECRET_KEY, указанный в settings.py) - внедряющийся не может иметь идентификатор сесии, равный идентификатору сессии внедряемого, и сервер обнаружит подлог. Ранее, когда мы делали авторизацию, в шаблоне формы с логином-паролем пользователя мы писали {% csrf_token %}. Это и есть указание Django, что при формировании HTML-кода по тому шаблону необходимо зашить в HTTP-заголовок зашифрованный идентификатор сессии. Этот зашифрованный идентификатор должен быть у всех запросов на сервер, которые так или иначе должны оставить след (т.е. модифицировать данные) на сервере. Один нюанс, который обязан помнить разработчик - зашифрованный идентификатор сессии должен вставляться и в заголовок AJAX-запросов, причём вставлять должен программист - Django тут бессильна. Делается это на стороне клиента, на JavaScript. Для этого необходимо в HTML-документе после инклюда b.js необходимо добавить инклюд на <a href="download_scripts/b_django.js" download>b_django.js</a>. В этом скрипте в функцию B.ajax() встраивается проверка на то, что запрос отправляет на сервер данные, что отправка производится на наш сервер, а не на внешний, и если это так, то вставляет нужный заголовок в запрос (зашифрованный идентификатор сессии берётся из cookies браузера пользователя, кука 'csrftoken', заголовок 'X-CSRFToken').</p>
+<p>Защита от внедрения SQL уже обеспечена Django, если вы работаете с БД через модели.</p>
+<p>Защита от скликивания(X-Frame) тоже обеспечена Django. Это запрет на встраивание вашей странички в странички сторонних сайтов.</p>
+<p>Переход на HTTPS будет описан ниже (HelloWorld №11.)</p>
+<p>Проверка заголовка хоста(ALLOWED_HOSTS) и безопасность сессий -
+<a href="https://www.djbook.ru/rel1.7/topics/security.html#host-header-validation" target="_blank">django security</a>
+</p>
+
+<h2>Hello World №7: AJAX, синхронизация вкладок, сессии и кнопка "Назад" в браузере</h2>
+<!-- здесь мы рассмотрим также вопрос о фиксации состояний в истории браузера: history.pushState() -->
+<!--  https://developer.mozilla.org/ru/docs/Web/API/History/pushState -->
+<p>Все веб-странички, прежде чем стать шаблоном, разрабатываются как странички.</p>
+<p>Представим себе, что мы разрабатываем компонент графического интерфейса веб-приложения. Очень удобно организовывать взаимодействие компонентов через объект состояния (которое первоначально устанавливается в B.StatePublisher). Вот у нас пользователь выбрал какой-то элемент в дереве - тут же в состоянии изменился идентификатор текущего элемента дерева. Изменение идентификатора текущего элемента дерева перехватывается обработчиком состояния приложения, где инициируется <hl>загрузка данных</hl> для таблички. После загрузки данных для таблицы, эти данные устанавливаются в тот раздел состояния, который мониторит компонент "Таблица", и пишет команду на обновление (чтобы компонент "Таблица" избавить от непрерывного выявления изменений в данных, мы явно указываем, какие данные в таблице поменялись). Как вы, наверное, уже заметили, мы меняем страницу не перезагружая её. Более того, если мы перезагрузим страницу, мы потеряем загруженные данные - мы ж не будем записывать табличные данные в параметр страницы - мы перед переходом на другую страницу, если требуется сохранить состояние, в состоянии оставим данные о текущей вкладке дерева (т.е. какие данные в таблицу надо будет грузить), но сами данные таблицы мы удалим. И так получается, что мы грузим данные для таблицы не покидая и не обновляя страницы. Вот такая загрузка и называется AJAX.</p>
+<p>Фреймворк b.js имеет функцию для AJAX-запроса - B.ajax({sourcePath:..., ...}). Справку по использованию данной функции вы получите в консоли, если вызовете функцию без параметров. Все запросы AJAX - асинхронные, так что принимать данные надо не сразу после инициирования загрузки, а в отдельном обработчике "данные загружены" или в обработчике "произошла ошибка получения данных".</p>
+<p>AJAX-запросы производятся по адресам ваших вьюх - вы должны иметь вьюхи, которые отдают не веб-страницу, а данные для страницы. Разница только в формате возвращаемых данных - веб-страничка всегда отдаётся в формате HTML, данные же для AJAX отдаются, как правило, в формате JSON, но также может быть и HTML, просто текстовые данные, картинки или звуковые записи, преобразованные в текст посредством base64, а могут быть даже тупо бинарные данные (B.ajax() не поддерживает загрузку бинарных данных).</p>
+<p>Чем особо интересен формат JSON - он является строковым представлением типа Object в JavaScript. Функция преобразования текста в формате JSON в объект JavaScript - JSON.parse(json). Функция преобразования объекта JavaScript в JSON - JSON.stringify(obj). По синтаксису JSON имеет лишь одно отличие от литеральной нотации объектов - имена свойств заключаются в кавычки. Вот пример JSON:</p>
+<inline_code>
+{"userText": "initial text", "myArray": [1,2,3], "mySubstate":{"1":11, "2":22}, "userName":"Крокодил", "cities":["Москва","Питер"]}
+</inline_code>
+<p>JSON помимо объекта может описывать также массив:</p>
+<inline_code>
+[1,2,3,45,-4,5]
+</inline_code>
+<p>Вот такой вот текст должны выдавать вьюхи, обеспечивающие наш сайт подгружаемыми данными. Ещё одно замечание по поводу кодировок текста. В шаблоне страницы (который &lt;бла-бла-бла>.html) в секции head явно указывается кодировка страницы:</p>
+<inline_code>
+&lt;meta charset="utf-8"/>
+</inline_code>
+<p>Вот в той кодировке, которую вы в HTML указали, и надо писать все данные для передачи по AJAX.</p>
+<p>Вот мы и подобрались к написанию примера на использование AJAX-загрузки данных.</p>
+<p>Пусть у нас есть список книг в формате JSON:</p>
+<inline_code><m_title>book_list.json :</m_title><br/>
+[<br/>
+<tab></tab> {<br/>
+    <tab></tab><tab></tab>  "id":"1",<br/>
+    <tab></tab><tab></tab>  "title":"title_1",<br/>
+    <tab></tab><tab></tab>  "author":"author_1"<br/>
+    <tab></tab>},<br/>
+    <tab></tab>{<br/>
+    <tab></tab><tab></tab>  "id":"2",<br/>
+    <tab></tab><tab></tab>  "title":"title_2",<br/>
+    <tab></tab><tab></tab>  "author":"author_2"<br/>
+    <tab></tab>}<br/>
+]
+</inline_code>
+<p>По каждой книге у нас есть более подробная информация в формате JSON (в отдельном файле для каждой книги):</p>
+<inline_code><m_title>1.json :</m_title><br/>
+{<br/>
+    <tab></tab>"title":"title_1",<br/>
+    <tab></tab>"author":"author_1",<br/>
+    <tab></tab>"year":"1978",<br/>
+    <tab></tab>"price": 5.6<br/>
+}
+</inline_code>
+<p>У нас будет список с книгами, при клике на кадую из которых справа будет отображаться более подробная информация по каждой книге.</p>
+<p>Сначала мы сделаем наше веб-приложение работающим на этих вот локальных JSON-файлах, а когда локально всё будет работать, перенесём наши html и js файлы в Django-проект, занесём реальные данные в БД (посредством моделей и админки), и будем генерировать JSON-данные уже по реальным книгам в БД.</p>
+<div style="padding:2px;border:1px solid #888;border-radius: 5px;max-width:700px;background:#ffa;margin:auto;">
+<p>Полный план работы в рамках Hello World №7:</p>
+<ol>
+<li><a href="#7.1">Делаем прототип на локальных файлах</a></li>
+<li><a href="#7.2">Переводим приложение на сервер Django, честную выгрузку из БД</a></li>
+<li><a href="#7.3">Прикручиваем авторизацию</a></li>
+<li><a href="#7.4">Обеспечиваем сохранение состояния приложения на сервере</a></li>
+<li><a href="#7.5">Включаем в оборот кнопку "назад" браузера</a></li>
+</ol>
+</div>
+<h4><a name="7.1"></a>Делаем прототип на локальных файлах</h4>
+<p style="border-radius:10px;background:#444;color:#ccc;padding:20px;"> Разработка веб-приложения на локальных файлах ведётся либо в Windows (Firefox /static/tab_apps/django/html/text/ Notepad/static/tab_apps/django/html/text/), либо в Ubuntu(firefox /static/tab_apps/django/html/text/ vim или notepadqq). <br/>Chrome в Windows (без использования специальных ключей запуска) не позволяет грузить AJAX из локальных файлов, специальные дистрибутивы Linux блокируют загрузку AJAX из локальных файлов по соображениям безопасности.<br/> </p>
+<p>Если вы работаете в Windows с браузером Google Chrome, вам необходимо запустить Chrome с ключом --allow-file-access-from-files. Для этого закрываем все открытые окна Chrome, нажимаем системную кнопку Пуск, ищем Chrome (в виндовс-7 можно просто набрать с клавиатуры), правой кнопкой мыши -> расположение файла. Найденного exe-шника делаем ярлык. Открываем свойства -> вкладка "Ярлык" -> В поле "Объект" в конце добавляем  --allow-file-access-from-files (уже после закрывающих кавычек). Отныне запускаем браузер с этого ярлыка, и у нас не будет проблем с AJAX-запросами к локально лежащим файлам.</p>
+<p>Для защиты от CSRF-атак нашего веб-приложения необходимо подключить скрипт b_django.js после b.js, но мы этого не будем - это надо делать уже при публикации веб-приложения - в работе используются Cookies, мы ж не будем пытаться хранить в своём браузере куки на переменчивый localhost.</p>
+<p>В работе нам понадобятся <a href="/static/tab_apps/django/html/text/data/hw7/b.js" download>скрипт b.js</a>, <a href="/static/tab_apps/django/html/text/data/hw7/favicon.ico" download>иконка</a>, скрипты <a href="/static/tab_apps/django/html/text/data/hw7/treeview.js" download>treeview.js</a> (которому, в свою очередь, требуются картинки <a href="/static/tab_apps/django/html/text/data/hw7/treeicons.png">treeicons.png</a> и <a href="/static/tab_apps/django/html/text/data/hw7/states.png">states.png</a>) и <a href="/static/tab_apps/django/html/text/data/hw7/tableview.js" download>tableview.js</a>. Все эти файлы мы сложим в одной директории - "hw7 / prototype" (как прототип того, что мы будем делать на Django). Пишем нашу заготовку на html, следим, чтобы кодировка была UTF-8:</p>
+<inline_code><m_title>hw7 / prototype / index.html :</m_title><br/>
+<hl>&lt;!doctype html><br/>
+&lt;html><br/>
+&lt;head><br/>
+&lt;meta charset="utf-8"/><br/>
+&lt;title>Hello World №7&lt;/title><br/>
+&lt;link href="favicon.ico" rel="shortcut icon" type="image/x-icon"/><br/>
+&lt;script src="b.js">&lt;/script><br/>
+&lt;script src="treeview.js">&lt;/script><br/>
+&lt;script src="tableview.js">&lt;/script><br/>
+&lt;/head><br/>
+&lt;body><br/>
+&lt;script src="gameplay.js">&lt;/script><br/>
+&lt;/body><br/>
+&lt;/html></hl>
+</inline_code>
+<p>Как видите, всю логику приложения мы вынесли в отдельный файл gameplay.js. Создаём этот файл:</p>
+<inline_code><m_title>hw7 / prototype / gameplay.js</m_title><br/>
+'use strict'; <span style="color:#888">// чтобы браузер писал нам об ошибках</span><br/><br/>
+ <span style="color:#888">//горизонтальный лейаут, растянутый на всю область отображения</span><br/>
+ <span style="color:#888">//префикс 'w' в имени - говорит о типе - это Widget</span><br/>
+var wRoot = new B.Strip(B.Strip__Orient__hor);<br/><br/>
+ <span style="color:#888">//добавляем виджет-контейнер для дерева (список книг у нас там будет)</span><br/>
+ <span style="color:#888">//указываем родительский виджет, если не хотим видеть</span><br/>
+ <span style="color:#888">//его растянутым на весь экран</span><br/>
+var wTree = new B.Widget(wRoot);<br/><br/>
+var wTable = new B.Widget(wRoot);<br/><br/>
+wRoot.addItem(wTree, '400px');<br/>
+wRoot.addItem(wTable);<br/>
+</inline_code>
+<p>Область отображения мы описали. Теперь осталось подключить к работе компоненты treeview.js и tableview.js и настроить их для отображения данных, представленных в виде JSON-файлов, расположенных в директории data (ещё успеем их туда положить).<span style="color:#888">Если вас смущает сплошное серое поле полученной страницы - посмотрите средством отладки HTML в браузере, сплошное серое поле состоит из левого серого поля и правого серого поля :)</span></p>
+<p>Сначала пишем сердце нашей машины состояний - объект состояния и издатель B.StatePublisher:</p>
+<inline_code><m_title>hw7 / prototype / gameplay.js :</m_title><br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+ var state = {tree:{},table:{}};<br/>
+ var statePublisher = new B.StatePublisher()<br/>
+ statePublisher.setState(state);
+</inline_code>
+<p>Теперь мы должны создать и включить в систему взаимного оповещения об изменениях состояния обработчики состояний - дерева и таблицы. Классы TreeView и TableView наследуются от класса B.StateSubscriber, что позволяет нам сделать это без больших трудозатрат.</p>
+<p>Справку по использованию компонента TreeView см. в консоли браузера. Для этого наберите:</p>
+<inline_code>TreeView();</inline_code>
+<p>Итак, добавляем дерево:</p>
+<inline_code><m_title>hw7 / prototype / gameplay.js :</m_title><br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+ statePublisher.registerSubscriber(new TreeView(<br/>
+ <tab></tab>    wTree,<br/>
+ <tab></tab>function(s){<br/>
+ <tab></tab><tab></tab>  if (s && s.hasOwnProperty('tree'))<br/>
+ <tab></tab><tab></tab><tab></tab>    return s.tree;<br/>
+ <tab></tab><tab></tab>  return undefined;<br/>
+ <tab></tab>},<br/>
+ <tab></tab>'tree_data.json'<br/>
+ ));
+</inline_code>
+<p>При клике пользователем по элементу дерева в state.tree изменится(появится) свойство selected - это id элемента дерева, который пользователь выделил. Данные в нашем случае будут загружаться из файла tree_data.json, а изменения в дереве мониториться не будут.</p>
+<p>Согласно справке по компоненту TreeView оформляем файл tree_data.json:</p>
+<inline_code><m_title>hw7 / prototype / tree_data.json :</m_title><br/>
+[<br/>
+<tab></tab>{"id":1,"name":"book_1","hasChildren":false,"state":0},<br/>
+<tab></tab>{"id":2,"name":"book_2","hasChildren":false,"state":0}<br/>
+]
+</inline_code>
+<p>Чтобы подключить таблицу, достаточно передать функцию параметром конструктора. Эта функция получат на вход объект состояния (обычный объект JavaScript), на выходе должна выдавать тот объект из состава переданного параметром, где хранятся данные для таблицы. В отличие от дерева, таблица не загружает данные самостоятельно, и нуждается во внешнем загрузчике данных. К этому мы ещё вернёмся. Данные для элемента дерева с id=xx будут загружаться по адресу /details/xx.</p>
+<inline_code><m_title>hw7 / prototype / gameplay.js :</m_title><br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+ statePublisher.registerSubscriber(new TableView(function(s){return s.table;}, wTable));
+ </inline_code>
+ <p>Создаём директорию details (а там файлы 1.json и 2.json) и файл tree_data.json. В этих файлах будут наши данные, пока страничка не готова для отправки на сервер. Формат данных, отдаваемых сервером (т.е. сейчас это формат данных в созданных нами файлах), можно посмотреть, вызвав справку командой <hl>TableView();</hl> в консоли браузера.</p>
+ <p>Согласно справке, табличные данные рписываются в следующем виде (это будет 1.json):</p>
+ <inline_code><m_title> details / 1.json :</m_title><br/>
+ {<br/>
+<tab></tab> "h":[{"t":"Магазин"},{"t":"Цена"}],<br/>
+<tab></tab> "rows":[<br/>
+<tab></tab><tab></tab> {<br/>
+<tab></tab><tab></tab><tab></tab> "ws_id": 1111,<br/>
+<tab></tab><tab></tab><tab></tab> "d": [{"t":"БиблиоГлобус"},{"t":"48р."}]<br/>
+<tab></tab><tab></tab> },<br/>
+<tab></tab><tab></tab> {<br/>
+<tab></tab><tab></tab><tab></tab> "ws_id": 2222,<br/>
+<tab></tab><tab></tab><tab></tab> "d": [{"t":"ЧитайГород"},{"t":"50р."}]<br/>
+<tab></tab><tab></tab> }<br/>
+<tab></tab> ]<br/>
+ }
+ </inline_code>
+ <p>Аналогично пишем и файл <hl>details / 2.json</hl> . Чтобы увидеть потом, что данные действительно в таблице загружаются какие надо, в 2.json мы заносим на одну строку данных больше (например, в Доме Книги ещё можно купить), да и цены другие.</p>
+ <p>Для того, чтобы видеть процесс, добавим отладочный виджет - он будет нам показывать объект состояния. После окончания разработки, этот код необходимо будет удалить (или закомментировать). <span style="color:#888">Если посмотрите исходники данного руководства - кокретно gameplay.js (подключается в конце html-файла) - то вы увидите как раз такой блок закомментированный</span></p>
+ <inline_code><m_title>hw7 / prototype / gameplay.js :</m_title><br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+ var eDebug = document.createElement('div');<br/>
+ var wDebug = new B.Widget(wRoot, false);<br/>
+ wDebug.setContent(eDebug, '#000');<br/>
+ wRoot.addItem(wDebug, '500px');<br/>
+ statePublisher.registerSubscriber(new B.StateDebugWidget(eDebug));
+ </inline_code>
+ <p>Почему так сложно подключается B.StateDebugWidget - потому что B.StateDebugWidget сделан так, что может работать и без виджетов (универсальный вот такой). Это скорей исторически сложилось, чем необходимость. Может займусь модернизацией, но пока что и поважней дела есть..., так что копируйте отсюда блок кода и не парьтесь.</p>
+ <p>Теперь вопрос. Кто будет менять данные таблице, когда пользователь вменил текущий элемент на дереве? Мы должны написать обработчик состояния. Создаём файл mysubscriber.js и описываем там класс, отнаследованный от класса B.StateSubscriber (определён в b.js):</p>
+ <inline_code><m_title>mysubscriber.js :</m_title><br/>
+ 'use strict';<br/><br/>
+ function MySubscriber(){<br/>
+ }<br/>
+ MySubscriber.prototype = Object.create(B.StateSubscriber);<br/>
+ MySubscriber.prototype.constructor = MySubscriber;<br/>
+ </inline_code>
+ <p>Добавляем этот файл в наш index.html</p>
+ <inline_code><m_title>index.html :</m_title><br/>
+ ...<br/>
+&lt;script src="tableview.js">&lt;/script><br/>
+<hl>&lt;script src="mysubscriber.js">&lt;/script></hl><br/>
+&lt;/head><br/>
+...
+ </inline_code>
+ <p>В gameplay.js создаём и подключаем экземпляр нашего обработчика состояния:</p>
+ <inline_code><m_title>gameplay.js :</m_title><br/>
+ ...<br/>
+ statePublisher.registerSubscriber(new TableView(function(s){return s.table;}, wTable));<br/>
+ <hl>statePublisher.registerSubscriber(new MySubscriber());</hl><br/>
+ ...
+ </inline_code>
+ <p>Запускаем (т.е. смотрим, как оно будет выглядеть в браузере). В консоль браузера пишется сообщение</p>
+ <inline_code>
+Uncaught TypeError: subscr.<hl>processStateChanges</hl> is not a function<br/>
+<tab></tab>    at StatePublisher.registerSubscriber (b.js:44)<br/>
+<tab></tab>        at gameplay.js:24
+ </inline_code>
+ <p>Описывая обработчик состояния, мы должны переопределить метод <hl>processStateChanges</hl>. Лезем в mysubscriber.js:</p>
+ <inline_code><m_title>mysubscriber.js :</m_title><br/>
+'use strict';<br/><br/>
+
+function MySubscriber(){<br/>
+<hl><tab></tab> this._currentTreeItemId = -1; // наше дерево вот так помечает, что нет выделенного<br/>
+<tab></tab> // вообщето-то, проще и правильней было бы оставить как undefined или null...</hl><br/>
+}<br/>
+MySubscriber.prototype = Object.create(B.StateSubscriber.prototype);<br/>
+MySubscriber.prototype.constructor = MySubscriber;<br/>
+<hl>MySubscriber.prototype.processStateChanges = function(s){<br/>
+<tab></tab> var selected = -1;<br/>
+<tab></tab> if (s && s.hasOwnProperty('tree') && s.tree.hasOwnProperty('selected') && s.tree.selected >= 0)<br/>
+<tab></tab><tab></tab>      selected = s.tree.selected;<br/>
+<tab></tab> if (s.tree.selected === this._currentTreeItemId)<br/>
+<tab></tab><tab></tab>      return;//оставляем без изменений<br/><br/>
+    
+<tab></tab> this._currentTreeItemId = selected;<br/>
+<tab></tab> if (selected >= 0){<br/>
+<tab></tab>     (function(self){<br/>
+<tab></tab><tab></tab>          B.ajax({<br/>
+<tab></tab><tab></tab><tab></tab>               sourcePath: 'details/' /static/tab_apps/django/html/text/ self._currentTreeItemId /static/tab_apps/django/html/text/ '.json',<br/>
+<tab></tab><tab></tab><tab></tab>               readyFunc: function(result){<br/>
+<tab></tab><tab></tab><tab></tab<tab></tab>                 //загруженные данные таблицы записываем в ту область объекта состояния, где<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>                    //компонент Таблица их счтывает<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>                    self._state.table.table_data = JSON.parse(result);<br/><br/>
+                    
+<tab></tab><tab></tab><tab></tab><tab></tab>                    //помечаем, что таблица нуждается в обновлении данных<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>                    self._state.table.table_changes = {reset:true};<br/><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>                    //оповещаем остальные компоненты, что состояние изменилось<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>                    self._registerStateChanges();<br/>
+<tab></tab><tab></tab><tab></tab>               }<br/>
+<tab></tab><tab></tab>          });<br/>
+<tab></tab><tab></tab>      })(this);<br/>
+<tab></tab> }<br/>
+<tab></tab> else{<br/>
+<tab></tab><tab></tab>      //очищаем таблицу<br/>
+<tab></tab><tab></tab>      this._state.table.table_data = {};<br/>
+<tab></tab><tab></tab>      this._state.table.table_changes = {reset:true};<br/>
+<tab></tab><tab></tab>      this._registerStateChanges();<br/>
+<tab></tab> }<br/>
+}</hl><br/>
+ </inline_code>
+ <p>Запускаем наш код в браузере. Видим список из двух книг. При клике по названию книги отображается табличка с данными, где сколько такая книга стоит.</p>
+ <p>Настало время переносить наше простенькое приложение на сервер Django. Отладочную область в нашем приложении мы не спешим убирать - на случай, что возникнут какие-то коллзии при переносе.</p>
+
+
+
+<h4><a name="7.2"></a>Переводим приложение на сервер Django, честную выгрузку из БД</h4>
+<p>Как обычно создаём проект, приложение root_app, прописываем все urls, settings (см. HelloWorld №6 за пошаговой инструкцией). Сейчас у нас прописан url только до крневой странички. Там мы будем отображать шаблон, который мы сделаем из того, что в prototype (результаты нашего труда с локальными файлами) называется index.html. Значит, мы должны добавить в шаблоны index.html, сделать из него шаблон, прописать на рендеринг во вьюхе. Потом мы будем добавлять скрипты и картинки, которые использует шаблон index.html. Поехали!</p>
+<inline_code><m_title>Команды в консоли :</m_title><br/>
+<shell_welcome>hw7$</shell_welcome> mkdir static templates<br/>
+<shell_welcome>hw7$</shell_welcome> mkdir static/root_app<br/>
+<shell_welcome>hw7$</shell_welcome> mkdir templates/root_app<br/>
+<shell_welcome>hw7$</shell_welcome> cp prototype/index.html templates/root_app/<br/>
+<shell_welcome>hw7$</shell_welcome> cp prototype/*.js static/root_app/<br/>
+<shell_welcome>hw7$</shell_welcome> cp prototype/*.png static/root_app/<br/>
+<shell_welcome>hw7$</shell_welcome> cp prototype/*.ico static/root_app/<br/>
+</inline_code>
+<p>Копируем файл index.html из hw7/prototype в hw7/templates/root_app/ . Файлы b.js, favicon.ico, gameplay.js, mysubscriber.js, states.png, tableview.js, treeview.js и treeicons.png копируем в hw7/static/root_app/ .</p>
+<p>Преобразуем index.html в шаблон:</p>
+<inline_code><m_title>hw7 / templates / root_app / index.html :</m_title><br/>
+<hl>{% load static %}</hl><br/>
+&lt;!doctype html><br/>
+&lt;html><br/>
+&lt;head><br/>
+&lt;meta charset="utf-8"/><br/>
+&lt;title>Hello World №7&lt;/title><br/>
+&lt;link href="<hl>{% static 'root_app/</hl>favicon.ico<hl>' %}</hl>" rel="shortcut icon" type="image/x-icon"/><br/>
+&lt;script src="<hl>{% static 'root_app/</hl>b.js<hl>' %}</hl>">&lt;/script><br/>
+&lt;script src="<hl>{% static 'root_app/</hl>treeview.js<hl>' %}</hl>">&lt;/script><br/>
+&lt;script src="<hl>{% static 'root_app/</hl>tableview.js<hl>' %}</hl>">&lt;/script><br/>
+&lt;script src="<hl>{% static 'root_app/</hl>mysubscriber.js<hl>' %}</hl>">&lt;/script><br/>
+&lt;/head><br/>
+&lt;body><br/>
+&lt;script src="<hl>{% static 'root_app/</hl>gameplay.js<hl>' %}</hl>">&lt;/script><br/>
+&lt;/body><br/>
+&lt;/html><br/>
+</inline_code>
+<p>Используем этот шаблон в нашей вьюхе:</p>
+<inline_code><m_title>hw7 / root_app / view.py :</m_title><br/>
+from django.shortcuts import render<br/><br/>
+
+# Create your views here.<br/>
+<hl>def index(request):<br/>
+<tab></tab> return render(request, 'root_app/index.html')</hl><br/>
+</inline_code>
+<p>Запускаем сервер и смотрим в браузере, что получилось. Видим, что данных у нас нет - нет списка книг. Это потому что наше приложение на локальных файлах забирало данные из локальных файлов. Сейчас надо сделать отдельные вьюхи, соответствующие тем файлам *.json, которые у нас были (tree_data.json и папка details с 1.json и 2.json, мы их ни в static, ни в templates не копировали).</p>
+<inline_code><m_title>hw7 / root_app / view.py :</m_title><br/>
+from django.shortcuts import render<br/>
+<hl>from django.http import JsonResponse</hl><br/>
+
+# Create your views here.<br/>
+def index(request):<br/>
+<tab></tab> return render(request, 'root_app/index.html')<br/>
+<hl>def tree_data(request):<br/>
+<tab></tab>response_data = [<br/>
+<tab></tab><tab></tab>{"id":1,"name":"book_1","hasChildren":False,"state":0},<br/>
+<tab></tab><tab></tab>{"id":2,"name":"book_2","hasChildren":False,"state":0}<br/>
+<tab></tab>]<br/>
+<tab></tab>return JsonResponse(response_data, safe=False)</hl><br/>
+</inline_code>
+<p>Здесь мы создали объект python, синтаксис объявления которого в python совпадает с синтаксисом JSON. Совпадает, да не во всём - то, что в JSON (и в JavaScript) true и false, в python-е True и False (с большой буквы). Ещё один комментарий: "safe=False" в параметрах JsonResponse снимает ограничение, что передавать можно только dict-ы (которые соответствуют JavaScript-овым Объектам). Снятие этой защиты не делает наше веб-приложение уязвимым, если мы точно знаем, что передаём корректный массив или объект (ой, простите, dict).</p>
+<inline_code><m_title>hw7 / root_app / urls.py :</m_title><br/>
+from django.conf.urls import url, include<br/>
+from . import views<br/><br/>
+urlpatterns = [<br/>
+<tab></tab>url(r'^$', views.index, name='index'),<br/>
+<tab></tab><hl>url(r'^tree_data.json$', views.tree_data, name='tree_data'),</hl><br/>
+]<br/>
+</inline_code>
+<p>Смотрим, что будет, если в браузере зайти по адресу localhost:8080 / tree_data.json. Выводится всё то, что раньше было в файле tree_data.json. Если теперь запустим наше веб-приложение (localhost:8080), то увидим, что появился список книг. Хорошо! Прежде чем переводить на сервер данные из prototype/details/ , сделаем так, чтобы данные были не зашиты в коде, а выбирались из базы данных, то есть чтобы отображаемый список книг можно было корректировать на нашей админке.</p>
+<p>Создаём модель Book.</p>
+<inline_code><m_title>hw7 / root_app / models.py :</m_title><br/>
+from __future__ import unicode_literals<br/><br/>
+from django.db import models<br/><br/>
+# Create your models here.<br/>
+<hl>class Book(models.Model):<br/>
+<tab></tab>name = models.CharField(max_length=200)<br/>
+<tab></tab>def __str__(self):<br/>
+<tab></tab><tab></tab>return self.name</hl><br/>
+</inline_code>
+<p>Прописываем в settings.py, чтобы добавить под контроль админке:</p>
+<inline_code><m_title>hw7 / hw7 / settings.py :</m_title><br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+# Application definition<br/><br/>
+INSTALLED_APPS = [<br/>
+<tab></tab>'django.contrib.admin',<br/>
+<tab></tab>'django.contrib.auth',<br/>
+<tab></tab>'django.contrib.contenttypes',<br/>
+<tab></tab>'django.contrib.sessions',<br/>
+<tab></tab>'django.contrib.messages',<br/>
+<tab></tab>'django.contrib.staticfiles',<br/>
+<tab></tab><hl>'root_app.apps.RootAppConfig',</hl><br/>
+]<br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+</inline_code><br/>
+<inline_code><m_title>hw7 / root_app / admin.py :</m_title><br/>
+from django.contrib import admin<br/>
+<hl>from .models import Book<br/></hl><br/>
+# Register your models here.<br/>
+<hl>admin.site.register(Book)</hl>
+</inline_code>
+<p>Запускаем генерацию БД, создаём админскую учётку. Прежде чем продолжать, остановите, пожалуйста, ваш сервер, если он запущен.</p>
+<inline_code><m_title>Команды в консоли :</m_title><br/>
+<shell_welcome>hw7$</shell_welcome> python manage.py makemigrations root_app<br/>
+<shell_welcome>hw7$</shell_welcome> python manage.py migrate<br/>
+<shell_welcome>hw7$</shell_welcome> python manage.py createsuperuser<br/>
+</inline_code>
+<p>Теперь идём в админку (<hl>localhost:8080/admin/</hl> в браузере) и добавляем книги в нашу БД.</p>
+<p>Чтобы занесённые нами в БД книги отображались (я занёс 3, в то время как на файлах у нас было зашито только две), поправим вьюху:</p>
+<div style="overflow:auto;background:#000;">
+<img src="/static/tab_apps/django/html/text/data/hw7/hw7_1.png"/>
+</div>
+<p style="background:#af0">Добавили новые модели... (надо описать!), модели реляционные, надо разобраться как настроить админку для нормальной (удобной т.е.) работы с админкой: <a href="https://www.youtube.com/watch?v=5SfdL1seDoE">Полноразмерный пример (видео)</a>, <a href="https://www.youtube.com/watch?v=nboiaNlX_Cs">Краткая выжимка теории (рус)</a>, <a href="https://www.youtube.com/watch?v=Xb9zfoJJzWg">Обзор админки в Dj-1.9 (good english)</a>, <a href="https://docs.djangoproject.com/en/1.11/ref/contrib/admin/">Офиц. документация</a></p>
+<p>Добавим модели (т.е. таблицы БД) для хранения магазинов (Market) и наличия книг в магазинах (BookMarket).</p>
+<inline_code><m_title>hw7 / root_app / models.py :</m_title><br/>
+from __future__ import unicode_literals<br/><br/>
+from django.db import models<br/><br/>
+# Create your models here.<br/>
+class Book(models.Model):<br/>
+<tab></tab>name = models.CharField(max_length=200)<br/>
+<tab></tab>def __str__(self):<br/>
+<tab></tab><tab></tab>return self.name<br/>
+<br/>
+<hl>
+class Market(models.Model):<br/>
+<tab></tab>    name = models.CharField(max_length=200)<br/>
+<tab></tab>    def __str__(self):<br/>
+<tab></tab><tab></tab>        return self.name<br/><br/>
+
+class BookMarket(models.Model):<br/>
+<tab></tab>    <span style="color:#888;">#market = models.ForeignKey(Market, on_delete=models.CASCADE)</span><br/>
+<tab></tab>    book = models.ForeignKey(Book)<br/>
+<tab></tab>    market = models.ForeignKey(Market)<br/>
+<tab></tab>    count = models.IntegerField()<br/>
+<tab></tab>    price = models.CharField(max_length=8)<br/>
+</hl>
+</inline_code><br/>
+<p>Теперь добавим возможность заносить данные по магазинам и наличию книг в магазинах посредством админки. Для этого создадим файл admin.py:</p>
+<inline_code><m_title>hw7 / root_app / admin.py :</m_title><br/>
+<hl>from django.contrib import admin<br/>
+from .models import Book, Market, BookMarket<br/><br/>
+
+# Register your models here.<br/>
+class BookMarketAdmin(admin.TabularInline):<br/>
+<tab></tab>    model = BookMarket<br/>
+<tab></tab>    extra = 0<br/><br/>
+class BookAdmin(admin.ModelAdmin):<br/>
+<tab></tab>    fieldsets = [<br/>
+<tab></tab><tab></tab>        (None, {'fields':['name']}),<br/>
+<tab></tab>    ]<br/>
+<tab></tab>    inlines = [BookMarketAdmin]<br/><br/>
+class MarketAdmin(admin.ModelAdmin):<br/>
+<tab></tab>    fieldsets = [<br/>
+<tab></tab><tab></tab>        (None, {'fields':['name']}),<br/>
+<tab></tab>    ]<br/>
+<tab></tab>    inlines = [BookMarketAdmin]<br/><br/>
+
+admin.site.register(Book, BookAdmin)<br/>
+admin.site.register(Market, MarketAdmin)</hl><br/>
+</inline_code><br/>
+<p>Теперь ещё раз запускаем команды, генерирующие БД:</p>
+<inline_code><m_title>Команды в консоли :</m_title><br/>
+<shell_welcome>hw7$</shell_welcome> python manage.py makemigrations root_app<br/>
+<shell_welcome>hw7$</shell_welcome> python manage.py migrate<br/>
+</inline_code>
+<p>Ну а сейчас запускаем сервер, идём в нашу админку и добавляем несколько магазинов, и для каждого магазина заносим, сколько и почём там книги, занесённые нами в модель Book. Админку мы настроили таким образом, чтобы книги, по которым надо занести данные о наличии, были у администратора перед глазами.</p>
+<p>Пишем вьюху, отдающую данные для таблицы. В prototype это были файлы 1.json и 2.json в папке details.</p>
+<inline_code><m_title>hw7 / root_app / urls.py :</m_title><br/>
+from django.conf.urls import url, include<br/>
+from . import views<br/><br/>
+urlpatterns = [<br/>
+<tab></tab>    url(r'^$', views.index, name='index'),<br/>
+<tab></tab>    url(r'^tree_data.json$', views.tree_data, name='tree_data'),<br/>
+<tab></tab>    <hl>url(r'^details/(?P<book_id>[0-9]/static/tab_apps/django/html/text/).json$', views.details, name='details')</hl><br/>
+]<br/>
+</inline_code><br/>
+<inline_code><m_title>hw7 / root_app / views.py :</m_title><br/>
+from django.shortcuts import render<br/>
+from django.http import JsonResponse<br/>
+from .models import Book<hl>, BookMarket, Market</hl><br/><br/>
+# Create your views here.<br/>
+def index(request):<br/>
+<tab></tab>    return render(request, 'root_app/index.html')<br/>
+def tree_data(request):<br/>
+<tab></tab>    response_data = []<br/>
+<tab></tab>    books = Book.objects.all()<br/>
+<tab></tab>    for i in books:<br/>
+<tab></tab><tab></tab>        response_data.append({"id":i.id, "name":i.name, "hasChildren":False})<br/>
+<tab></tab>    return JsonResponse(response_data, safe=False)<br/><br/>
+<hl>def details(request, book_id):<br/>
+<tab></tab>    response_data = {<br/>
+<tab></tab><tab></tab>        'h':[{'t':'Market'},{'t':'Price'}],<br/>
+<tab></tab><tab></tab>        'rows':[]<br/>
+<tab></tab>    }<br/>
+<tab></tab>    print response_data<br/>
+<tab></tab>    bookMarkets = BookMarket.objects.filter(book = book_id)<br/>
+<tab></tab>    for i in bookMarkets:<br/>
+<tab></tab><tab></tab>        response_data['rows'].append({<br/>
+<tab></tab><tab></tab><tab></tab>            'ws_id':i.id,<br/>
+<tab></tab><tab></tab><tab></tab>            'd':[<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>                {'t':i.market.name},<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>                {'t':i.price}<br/>
+<tab></tab><tab></tab><tab></tab>            ]<br/>
+<tab></tab><tab></tab>        })<br/>
+<tab></tab>    return JsonResponse(response_data)</hl><br/>
+</inline_code><br/>
+
+
+<span style="color:#888;">Текст находится в разработке...</span>
+<h4><a name="7.3"></a>Прикручиваем авторизацию</h4>
+<span style="color:#888;">Текст находится в разработке...</span>
+<h4><a name="7.4"></a>Обеспечиваем сохранение состояния приложения на сервере</h4>
+<span style="color:#888;">Текст находится в разработке...</span>
+<h4><a name="7.5"></a>Включаем в оборот кнопку "назад" браузера</h4>
+<span style="color:#888;">Текст находится в разработке...</span>
+
+
+
+<br/><br/>
+<span style="color:#888;">Текст находится в разработке...</span>
+
+<!--<h2>Hello World №8: Работа с БД PostgreSQL</h2>
+<p><a href="https://docs.djangoproject.com/en/1.11/topics/db/sql/" target="_blank">Здесь</a> и 
+<a href="http://www.chrisumbel.com/article/django_python_stored_procedures.aspx" target="_blank">здесь</a> есть какие-то описания</p>
+<span style="color:#888;">Текст находится в разработке...</span>-->
+
+
+<h2>Немного теории: работа с вьюхами</h2>
+<h4>Вьюхи-классы</h4>
+<p>В Django вьюхи не обязательно должны быть представлены отдельными функциями - могут быть и классами. Вьюхи-классы обязательно должны быть отнаследованы от класса Django View:</p>
+<table style="border-radius:5px;background:#048;">
+<tr style="background:#048;text-align:center;color:#fff;">
+<td style="">
+Вьюха-функция
+</td>
+<td>
+Вьюха-класс
+</td>
+</tr>
+<tr style="background:#bef;">
+<td style="margin:10px;">
+from django.http import HttpResponse<br/><br/>
+def my_view(request):<br/>
+<tab></tab>if request.method == 'GET':<br/>
+<tab></tab><tab></tab><span style="color:#888;">. . .</span><br/>
+<tab></tab><tab></tab>return HttpResponse('Hello!')
+</td>
+<td style="margin:10px;">
+from django.http import HttpResponse<br/>
+from django.views import View<br/><br/>
+class MyView(View):<br/>
+<tab></tab>def get(self, request):<br/>
+<tab></tab><tab></tab><span style="color:#888;">. . .</span><br/>
+<tab></tab><tab></tab>return HttpResponse('Hello!')
+</td>
+</tr>
+</table>
+<p>Вьюха-функция вызывается при запросе любого типа (GET, POST или другого), поэтому внутри этой функции мы должны ставить условное ветвление в зависимости от типа запроса. Во вьюхе-классе для разных типов запроса используются разные методы (мы переопределяем (или НЕ переопределяем) методы get и post).</p>
+<p>Прописывание вьюх в urls.py:</p>
+<table style="border-radius:5px;background:#048;">
+<tr style="background:#048;text-align:center;color:#fff;">
+<td style="">
+Вьюха-функция
+</td>
+<td>
+Вьюха-класс
+</td>
+</tr>
+<tr style="background:#bef;">
+<td style="margin:10px;">
+urlpatterns = [<br/>
+<tab></tab><span style="color:#888;">. . .</span><br/><br/>
+<tab></tab>url(r'^about/$', my_view)<br/>
+<tab></tab><span style="color:#888;">. . .</span><br/>
+]
+</td>
+<td style="margin:10px;">
+urlpatterns = [<br/>
+<tab></tab><span style="color:#888;">. . .</span><br/>
+<tab></tab>url(r'^about/$', MyView<hl>.as_view()</hl>)<br/>
+<tab></tab><span style="color:#888;">. . .</span><br/>
+]
+</td>
+</tr>
+</table>
+<p>Следует отметить, что метод as_view() принимает параметры, которые позволяют параметризовать вашу вьюху. Вообще параметризовать вьюху можно двумя способами: либо отнаследоваться и переопределить какие-то поля/методы, либо конструктору передать параметры, задающие значения одного или нескольких полей. Например так:</p>
+<inline_code>
+urlpatterns = [<br/>
+<tab></tab>    url(r'^about/$', GreetingView.as_view(greeting="G'day")),<br/>
+]
+</inline_code>
+<p>, где greeting является свойством (или, по-сишному, полем) класса GreetingView</p>
+<p>Вьюхи-классы нам понадобятся, когда мы будем делать вьюхи на основе Django-вских базовых классов (а именно, формы пользовательского ввода).</p>
+<p>Приведём простенький пример, как использовать формы Django во вьюхах-функциях и во вьюхах-классах:</p>
+<table style="border-radius:5px;background:#048;">
+<tr style="background:#048;text-align:center;color:#fff;">
+<td style="">
+Вьюха-функция
+</td>
+<td>
+Вьюха-класс
+</td>
+</tr>
+<tr style="background:#bef;">
+<td style="margin:10px;">
+from django.http import HttpResponseRedirect<br/>
+from django.shortcuts import render<br/><br/>
+from .forms import MyForm<br/><br/>
+def myview(request):<br/>
+<tab></tab>if request.method == "POST":<br/>
+<tab></tab><tab></tab>form = MyForm(request.POST)<br/>
+<tab></tab><tab></tab>if form.is_valid():<br/>
+<tab></tab><tab></tab><tab></tab><span style="color:#888;">. . .</span><br/>
+<tab></tab><tab></tab><tab></tab>return HttpResponseRedirect('/success/')<br/>
+<tab></tab>else:<br/>
+<tab></tab><tab></tab>form = MyForm(initial={'key': 'value'})<br/><br/>
+<tab></tab>return render(request, 'form_template.html', {'form': form})<br/>
+</td>
+<td style="margin:10px;">
+from django.http import HttpResponseRedirect<br/>
+from django.shortcuts import render<br/>
+from django.views import View<br/><br/>
+from .forms import MyForm<br/><br/>
+class MyFormView(View):<br/>
+<tab></tab>form_class = MyForm<br/>
+<tab></tab>initial = {'key': 'value'}<br/>
+<tab></tab>template_name = 'form_template.html'<br/><br/>
+<tab></tab>def get(self, request, *args, **kwargs):<br/>
+<tab></tab><tab></tab>form = self.form_class(initial=self.initial)<br/>
+<tab></tab><tab></tab>return render(request, self.template_name, {'form': form})<br/><br/>
+<tab></tab>def post(self, request, *args, **kwargs):<br/>
+<tab></tab><tab></tab>form = self.form_class(request.POST)<br/>
+<tab></tab><tab></tab>if form.is_valid():<br/>
+<tab></tab><tab></tab><tab></tab><span style="color:#888;">. . .</span><br/>
+<tab></tab><tab></tab><tab></tab>return HttpResponseRedirect('/success/')<br/><br/>
+<tab></tab><tab></tab>return render(request, self.template_name, {'form': form})<br/>
+</td>
+</tr>
+</table>
+
+<div style="background:#af0;">
+<p>Далее в документации описывается тема Примесей (mixins).</p>
+<p>Если вы решили создать свою вьюху на основе Django-вских базовых классов, вам следует учитывать, что вьюха не может быть отнаследована от нескольких классов вьюх: вместо этого вам надо выбрать в качестве базового класса один класс вьюхи от Django, а остальное "добить" миксинами, ну и ручной кастомизацией, конечно.</p>
+</div>
+<h4>Декораторы</h4>
+<p>Декоратор - это функция, которая добавляет функциональности другой функции. Примерами декораторов являются login_required и permission_required (они упоминались в HelloWorld №6 (авторизация)).</p>
+<p>Вот как применяются декораторы к вьюхам:</p>
+<table style="border-radius:5px;background:#048;">
+<tr style="background:#048;text-align:center;color:#fff;">
+<td style="">
+</td>
+<td style="">
+Вьюха-функция
+</td>
+<td>
+Вьюха-класс
+</td>
+</tr>
+<tr style="background:#bef;">
+<td style="background:#048;color:#fff;">
+urls.py
+</td>
+<td style="margin:10px;">
+from django.contrib.auth.decorators import login_required, permission_required<br/>
+from . import views<br/><br/>
+urlpatterns = [<br/>
+<tab></tab>url(r'^vote/$', <hl>permission_required</hl>('polls.can_vote')(views.voteView)),<br/>
+]
+</td>
+<td style="margin:10px;">
+from django.contrib.auth.decorators import login_required, permission_required<br/>
+from django.views.generic import TemplateView<br/><br/>
+from .views import VoteView<br/><br/>
+urlpatterns = [<br/>
+<tab></tab>url(r'^about/$', <hl>login_required</hl>(TemplateView.as_view(template_name="secret.html"))),<br/>
+<tab></tab>url(r'^vote/$', <hl>permission_required('polls.can_vote')</hl>(VoteView.as_view())),<br/>
+]
+</td>
+</tr>
+<tr style="background:#bef;">
+<td style="background:#048;color:#fff;">
+Файл, где<br/>описана<br/>вьюха
+</td>
+<td style="margin:10px;">
+from django.contrib.auth.decorators import login_required<br/>
+<tab></tab><tab></tab><span style="color:#888;">. . .</span><br/>
+@login_reguired<br/>
+def my_view(request):<br/>
+<tab></tab><tab></tab><span style="color:#888;">. . .</span><br/>
+@permission_required('polls.can_vote')<br/>
+def another_view(request):<br/>
+<tab></tab><tab></tab><span style="color:#888;">. . .</span><br/>
+</td>
+<td style="margin:10px;">
+decorators = [never_cache, login_required]<br/><br/>
+@method_decorator(decorators, name='<span style="background:#af0;">dispatch'</span>)<br/>
+class ProtectedView(TemplateView):<br/>
+<tab></tab>template_name = 'secret.html'<br/><br/>
+<tab></tab><tab></tab><span style="color:#f44";>ИЛИ</span><br/>
+@method_decorator(never_cache, name=<span style="background:#af0;">'dispatch'</span>)<br/>
+@method_decorator(login_required, name=<span style="background:#af0;">'dispatch'</span>)<br/>
+class ProtectedView(TemplateView):<br/>
+<tab></tab>template_name = 'secret.html'
+</td>
+</tr>
+</table>
+<p>Мы подсветили в коде слово 'dispatch'. Это имя метода, к которому применяется декоратор. Почему мы применяем декораторы ограничения доступа именно к методу dispatch? Один класс вьюхи соответствует одной вьюхе. Для преобразования вьюхи-класса во вьюху-функцию (при подключении в urls.py) используется метод as_view(). Метод as_view() берёт функцию вьюхи у метода dispatch(), так что применять декоратор мы должны к методу dispatch() (это метод базового класса для всех вьюх View).</p>
+<h4>Базовые классы для вьюх</h4>
+<p>При создании веб-приложений мы часто снова и снова повторяем определенные шаблоны <span style="color:#888;">(имеются в виду не шаблоны Django, а русское слово "шаблон, модель поведения, образ мышления")</span> в разработке, что делает саму разработку скучной и монотонной. Django старается избавить нас от этой монотонности при работе с моделями и шаблонами, но и на уровне создания представлений (вьюх) часто возникают такие же проблемы.</p>
+<p>Общие представления(generic views, в нашем руководстве это "базовые вьюхи") Django были разработаны, чтобы избавить нас от этой скуки. В их основе лежит набор идиом и шаблонов, базирующийся на практическом опыте создания представлений, который дает нам абстрактный каркас для быстрого создания собственных представлений (вьюх), без необходимости писать лишний, повторяющийся код.</p>
+
+
+<span style="color:#888;">Текст находится в разработке...</span>
+
+<h2>Hello World №8: Предоставляемые Django элементы пользовательского ввода для форм</h2>
+<p>В Django есть класс Form, это базовый класс для форм пользовательского ввода. Подобно тому как поля модели соответствуют столбцам в БД, поля формы соответствуют элементам HTML-формы, которую форма представляет. Поля формы представлены экземплярами классов, такими как CharField, IntegerField, DataField и FileField, в которых опрелено какие данные должны быть там, какие ограничения на них накладываются (Django-формы сами проверяют на соответвие полученный от пользователя ответ) и как они должны отображаться/вести себя на веб-страничке. Вся прелесть в том, что в Django есть базовый набор таких Field-ов, готовых к использованию классов полей формы.</p>
+<p>Давайте сделаем HelloWorld-проект на использование форм с применением обработчиков полей Django. У нас будет страничка, на которой отображены имя, фамилия, фото, а также любимый цвет пользователя (на то, что пользователь не один, не обращаем внимание - это учебный пример(а так, необходима авторизация)) и кнопка "Изменить". По нажатии на кнопку "Изменить", пользователь переходит на страничку изменения данных с кнопками "Применить" и "Отмена". После обновления данных пользователь опять попадает на стартовую страничку. Сначала сделаем всё для имени и фамилии, и лишь когда закончим, добавим поля "Фото" и "Любимый цвет".</p>
+<p>Как обычно создаёт проект hw8, добавляем приложение root_app.</p>
+<inline_code>
+<shell_welcome>$</shell_welcome> django-admin startproject hw8<br/>
+<shell_welcome>$</shell_welcome> cd hw8<br/>
+<shell_welcome>hw8 $</shell_welcome> python manage.py startapp root_app<br/>
+<shell_welcome>hw8 $</shell_welcome> cp hw8/urls.py root_app/
+</inline_code><br/>
+<inline_code><m_title>hw8 / hw8 / urls.py :</m_title><br/>
+<span style="color:#888;">"""hw8 URL Configuration<br/><br/>
+The `urlpatterns` list routes URLs to views. For more information please see:<br/>
+    https://docs.djangoproject.com/en/1.10/topics/http/urls/<br/>
+Examples:<br/>
+Function views<br/>
+    1. Add an import:  from my_app import views<br/>
+    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')<br/>
+Class-based views<br/>
+    1. Add an import:  from other_app.views import Home<br/>
+    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')<br/>
+Including another URLconf<br/>
+    1. Import the include() function: from django.conf.urls import url, include<br/>
+    2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))<br/>
+"""</span><br/>
+from django.conf.urls import url<hl>, include</hl><br/>
+<span style="text-decoration:line-through;">from django.contrib import admin</span><br/><br/>
+urlpatterns = [<br/>
+<tab></tab>    <hl>url(r'^', include('root_app.urls')),</hl><br/>
+<tab></tab>    <span style="text-decoration:line-through;">url(r'^admin/', admin.site.urls),</span><br/>
+]
+</inline_code><br/>
+<inline_code><m_title>hw8 / root_app / urls.py :</m_title><br/>
+from django.conf.urls import url<br/>
+<span style="text-decoration:line-through;">from django.contrib import admin</span><br/><br/>
+<hl>from . import views</hl><br/><br/>
+urlpatterns = [<br/>
+<tab></tab>    <hl>url(r'^$', views.index),<br/>
+<tab></tab>    url(r'^edit$', views.edit),</hl><br/>
+<tab></tab>    <span style="text-decoration:line-through;">url(r'^admin/', admin.site.urls),</span><br/>
+]
+</inline_code><br/>
+<inline_code><m_title>hw8 / root_app / views.py :</m_title><br/>
+from django.shortcuts import render<br/>
+<hl>from django.http import HttpResponse</hl><br/><br/>
+# Create your views here.<br/>
+<hl>def index(request):<br/>
+<tab></tab>    return HttpResponse('1')<br/>
+def edit(request):<br/>
+<tab></tab>    return HttpResponse('2')</hl><br/>
+</inline_code><br/>
+<p>Создаём директории для шаблонов и для статических файлов:</p>
+<inline_code>
+    <shell_welcome>hw8 $</shell_welcome> mkdir static templates<br/>
+    <shell_welcome>hw8 $</shell_welcome> mkdir static/root_app templates/root_app
+</inline_code><br/>
+<inline_code><m_title>hw8 / hw8 / settings.py :</m_title><br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+ROOT_URLCONF = 'hw8.urls'<br/><br/>
+TEMPLATES = [<br/>
+ <tab></tab>   {<br/>
+ <tab></tab><tab></tab>           'BACKEND': 'django.template.backends.django.DjangoTemplates',<br/>
+ <tab></tab><tab></tab>           'DIRS': [<hl>os.path.join(BASE_DIR, 'templates')</hl>],<br/>
+ <tab></tab><tab></tab>           'APP_DIRS': True,<br/>
+ <tab></tab><tab></tab>           'OPTIONS': {<br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+ STATIC_URL = '/static/'<br/>
+ <hl>STATICFILES_DIRS = [<br/>
+ <tab></tab>os.path.join(BASE_DIR, "static"),<br/>
+ <tab></tab>'/var/www/static/',<br/>
+ ]</hl>
+</inline_code>
+<p>Пишем модель Personality:</p>
+<inline_code><m_title>hw8 / root_app / models.py :</m_title><br/>
+from __future__ import unicode_literals<br/><br/>
+from django.db import models<br/><br/>
+# Create your models here.<br/>
+<hl>class Personality(models.Model):<br/>
+<tab></tab>    name = models.CharField(max_length=32)<br/>
+<tab></tab>    last_name = models.CharField(max_length=32)<br/>
+<tab></tab>    def __str__(self):<br/>
+<tab></tab><tab></tab>        return '%s %s' % (self.name, self.last_name)<br/>
+<tab></tab>    def __unicode__(self):<br/>
+<tab></tab><tab></tab>        return '%s %s' % (self.name, self.last_name)</hl><br/>
+</inline_code><br/>
+<inline_code>
+<m_title>hw8 / hw8 / settings.py :</m_title><br/>
+....<br/>
+# Application definition<br/>
+<br/>
+INSTALLED_APPS = [<br/>
+<tab></tab>   'django.contrib.admin',<br/>
+<tab></tab>   'django.contrib.auth',<br/>
+<tab></tab>   'django.contrib.contenttypes',<br/>
+<tab></tab>   'django.contrib.sessions',<br/>
+<tab></tab>   'django.contrib.messages',<br/>
+<tab></tab>   'django.contrib.staticfiles',<br/>
+<tab></tab><hl>   'root_app.apps.RootAppConfig',</hl><br/>
+]<br/>
+....
+</inline_code>
+<p>Генерируем БД для созданной модели.</p>
+<inline_code>
+<shell_welcome>hw8 $</shell_welcome> python manage.py makemigrations root_app<br/>
+<shell_welcome>hw8 $</shell_welcome> python manage.py migrate<br/>
+</inline_code><br/>
+<p>Создаём файл шаблона стартовой странички index.html:</p>
+<inline_code><m_title>hw8 / templates / root_app / index.html :</m_title><br/>
+{% load static %}<br/>
+&lt;!doctype html><br/>
+&lt;html><br/>
+&lt;head><br/>
+&lt;meta charset="utf-8"/><br/>
+&lt;title>Hello World №8&lt;/title><br/>
+&lt;link href="{% static 'root_app/favicon.ico'%}" rel="shortcut icon" type="image/x-icon"/><br/>
+&lt;style><br/>
+body{<br/>
+<tab></tab>    background:#024;<br/>
+<tab></tab>    text-align: center;<br/>
+}<br/>
+#container{<br/>
+<tab></tab>    margin-top:200px;<br/>
+<tab></tab>    width:300px;<br/>
+<tab></tab>    height:128px;<br/>
+<tab></tab>    border: 4px solid #fff;<br/>
+<tab></tab>    border-radius:10px;<br/>
+<tab></tab>    background:#ffa;<br/>
+<tab></tab>    color:#004;<br/>
+<tab></tab>    display: inline-block;<br/>
+}<br/>
+#container table{<br/>
+<tab></tab>    padding:20px;<br/>
+}<br/>
+&lt;/style><br/>
+&lt;/head><br/>
+&lt;body><br/>
+&lt;div id="container"><br/>
+<tab></tab>&lt;table width="100%" height="100%"><br/>
+<tab></tab><tab></tab>&lt;tr><br/>
+<tab></tab><tab></tab><tab></tab>&lt;td>Имя:&lt;/td><br/>
+<tab></tab><tab></tab><tab></tab>&lt;td>{{name}}&lt;/td><br/>
+<tab></tab><tab></tab>&lt;/tr><br/>
+<tab></tab><tab></tab>&lt;tr><br/>
+<tab></tab><tab></tab><tab></tab>&lt;td>Фамилия:&lt;/td><br/>
+<tab></tab><tab></tab><tab></tab>&lt;td>{{last_name}}&lt;/td><br/>
+<tab></tab><tab></tab>&lt;/tr><br/>
+<tab></tab><tab></tab>&lt;tr><br/>
+<tab></tab><tab></tab><tab></tab>&lt;td colspan="2">&lt;button onclick="window.location.replace('/edit')">Изменить&lt;/button>&lt;/td><br/>
+<tab></tab><tab></tab>&lt;/tr><br/>
+<tab></tab>&lt;/table><br/>
+&lt;/div><span style="color:#888;">&lt;!-- div id=container --></span><br/>
+&lt;/body><br/>
+&lt;/html><br/>
+</inline_code><br/>
+<p>Кладём <a href="favicon.ico" download>иконку</a> в "static / root_app /" и прописываем вьюху для стартовой странички:</p>
+<inline_code><m_title>hw8 / root_app / views.py :</m_title><br/>
+<!--<tab></tab><tab></tab><span style="color:#888;">. . .</span><br/>-->
+<hl>#-*- coding: utf-8 -*-</hl><br/>
+from django.shortcuts import render<br/>
+from django.http import HttpResponse<br/><br/>
+<hl>from .models import Personality</hl><br/><br/>
+# Create your views here.<br/>
+def index(request):<br/>
+<tab></tab>    <hl>context = {<br/>
+<tab></tab><tab></tab>        'name':u'<не задано>',<br/>
+<tab></tab><tab></tab>        'last_name':u'<не задано>'<br/>
+<tab></tab>    }<br/>
+<tab></tab>    list = Personality.objects.all()<br/>
+<tab></tab>    if list.count() > 0:<br/>
+<tab></tab><tab></tab>        context['name'] = list[0].name<br/>
+<tab></tab><tab></tab>        context['last_name'] = list[0].last_name<br/>
+<tab></tab>    return render(request, 'root_app/index.html', context)</hl><br/>
+def edit(request):<br/>
+<tab></tab>    return HttpResponse('2')<br/>
+</inline_code><br/>
+<p>Вот мы, собственно и подобрались непосредственно к форме пользовательского ввода.</p>
+<p>Создаём файл forms.py:</p>
+<inline_code><m_title>hw8 / root_app / forms.py :</m_title><br/>
+#-*- coding: utf-8 -*-<br/>
+from django import forms<br/><br/>
+class MyForm(forms.Form):<br/>
+<tab></tab>    name = forms.CharField(label=u'Имя', max_length=32)<br/>
+<tab></tab>    last_name = forms.CharField(label=u'Фамилия', max_length=32)<br/>
+</inline_code><br/>
+<p>Создаём шаблон для нашей формы:</p>
+<inline_code><m_title>hw8 / templates / root_app / edit.html :</m_title><br/>
+{% load static %}<br/>
+&lt;!doctype html><br/>
+&lt;html><br/>
+&lt;head><br/>
+&lt;meta charset="utf-8"/><br/>
+&lt;title>HelloWorld №8&lt;/title><br/>
+&lt;link href="{% static 'root_app/favicon.ico' %}" rel="shortcut icon" type="image/x-icon" /><br/>
+&lt;/head><br/>
+&lt;body><br/>
+&lt;form action="" method="post"><br/>
+<tab></tab>    {% csrf_token %}<br/>
+<tab></tab>    {{ form }}<br/>
+<tab></tab>    &lt;input type="submit" value="Submit"/><br/>
+&lt;/form><br/>
+&lt;button onclick="window.location.replace('/')">Отмена&lt;/button><br/>
+&lt;/body><br/>
+&lt;/html><br/>
+</inline_code><br/>
+<p>Теперь пишем вьюху:</p>
+<inline_code><m_title>hw8 / root_app / views.py :</m_title></br>
+#-*- coding: utf-8 -*-<br/>
+from django.shortcuts import render<br/>
+from django.http import HttpResponse<hl>, HttpResponseRedirect</hl><br/><br/>
+
+from .models import Personality<br/>
+<hl>from .forms import MyForm</hl><br/><br/>
+
+# Create your views here.<br/>
+def index(request):<br/>
+<tab></tab>    context = {<br/>
+<tab></tab><tab></tab>        'name':u'<не задано>',<br/>
+<tab></tab><tab></tab>        'last_name':u'<не задано>'<br/>
+<tab></tab>    }<br/>
+<tab></tab>    list = Personality.objects.all()<br/>
+<tab></tab>    if list.count() > 0:<br/>
+<tab></tab><tab></tab>        context['name'] = list[0].name<br/>
+<tab></tab><tab></tab>        context['last_name'] = list[0].last_name<br/>
+<tab></tab>    return render(request, 'root_app/index.html', context)<br/>
+def edit(request):<br/>
+<tab></tab>    <hl>list = Personality.objects.all()<br/>
+<tab></tab>    if request.method == 'POST':<br/>
+<tab></tab><tab></tab>        form = MyForm(request.POST)<br/>
+<tab></tab><tab></tab>        if form.is_valid():<br/>
+<tab></tab><tab></tab><tab></tab>            name = form.cleaned_data['name']<br/>
+<tab></tab><tab></tab><tab></tab>            last_name = form.cleaned_data['last_name']<br/>
+<tab></tab><tab></tab><tab></tab>            if list.count() > 0:<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>                persona = list[0]<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>                persona.name = name<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>                persona.last_name = last_name <br/>
+<tab></tab><tab></tab><tab></tab>            else:<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>                persona = Personality(<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab><tab></tab>                    name = name,<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab><tab></tab>                    last_name = last_name<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>                )<br/>
+<tab></tab><tab></tab><tab></tab>            persona.save()<br/>
+<tab></tab><tab></tab><tab></tab>            return HttpResponseRedirect('/')<br/>
+<tab></tab>    else:<br/>
+<tab></tab><tab></tab>        name = ''<br/>
+<tab></tab><tab></tab>        last_name = ''<br/>
+<tab></tab><tab></tab>        if list.count() > 0:<br/>
+<tab></tab><tab></tab><tab></tab>            persona = list[0]<br/>
+<tab></tab><tab></tab><tab></tab>            name = persona.name<br/>
+<tab></tab><tab></tab><tab></tab>            last_name = persona.last_name<br/>
+<tab></tab><tab></tab><tab></tab>        form = MyForm(initial={'name':name, 'last_name':last_name})<br/>
+<tab></tab>    return render(request, 'root_app/edit.html', {'form': form})</hl>
+</inline_code>
+<p>Сейчас у нас данные запрашиваются, проверяются (!!), всё работает нормально.</p>
+
+<a href="https://djbook.ru/rel1.9/ref/forms/fields.html#built-in-field-classes" target="_blank">Поля формы, предоставляемые Django</a><br/>
+
+<h2>Hello World №9: Наследование шаблонов и полноценная авторизация</h2>
+<p>В данном примере мы реализуем полноценный механизм авторизации: логин-разлогин, регистрация новых пользователей (с подтверждением электронной почты), с восстановлением пароля. Всё по-взрослому. Максимально будем использовать Django.</p>
+<p>Прежде чем создавать проект на Django, мы должны написать прототип на статических файлах - так, чтобы красиво было. Я написал прототип с использованием библиотеки bootstrap (<a href="https://getbootstrap.com" target="_blank">getbootstrap.com</a>), которая, в свою очередь, использует библиотеку <a href="https://jquery.com/" target="_blank">jQuery</a>. Готовый прототип (там сделана шапка с выпадающим меню по авторизации и страница логина) скачайте <a href="/static/tab_apps/django/html/text/data/hw9/hw9_prototype.zip" download>здесь</a> (не забудьте распаковать архив перед запуском странички). Сначала я писал base.html, потом скопировал его в login.html и туда уже вставлял форму логина.</p>
+<p>Теперь, когда прототип у нас есть, создаём проект Django под именем hw9.</p>
+<inline_code><m_title>Коммандная строка:</m_title><br/>
+<shell_welcome>$</shell_welcome> django-admin startproject hw9<br/>
+<shell_welcome>$</shell_welcome> cd hw9<br/>
+<shell_welcome>hw9 $</shell_welcome> <br/>
+</inline_code>
+<p>Создаём директории templates и static и прописываем в hw9 / settings.py:</p>
+<inline_code><m_title>hw9 / hw9 / settings.py :</m_title><br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+ROOT_URLCONF = 'hw9.urls'<br/><br/>
+TEMPLATES = [<br/>
+ <tab></tab>   {<br/>
+ <tab></tab><tab></tab>           'BACKEND': 'django.template.backends.django.DjangoTemplates',<br/>
+ <tab></tab><tab></tab>           'DIRS': [<hl>os.path.join(BASE_DIR, 'templates')</hl>],<br/>
+ <tab></tab><tab></tab>           'APP_DIRS': True,<br/>
+ <tab></tab><tab></tab>           'OPTIONS': {<br/>
+ <tab></tab><span style="color:#888">. . .</span><br/>
+ STATIC_URL = '/static/'<br/>
+ <hl>STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]<br/>
+LOGIN_REDIRECT_URL = '/'<br/>
+LOGIN_URL = '/accounts/login/'<br/>
+LOGOUT_REDIRECT_URL = '/' #since Django version 1.10<br/>
+</hl>
+</inline_code>
+<p>Создаём директории static / accounts_app и templates / accounts_app.</p>
+<p>Копируем папку contrib из нашего прототипа в static.</p>
+<p>Файлы avatar.png и login.css копируем в static / accounts_app. Файл base.html копируем в templates, файл login.html копируем в templates / accounts_app.</p>
+
+<p>Создаём директории static / root_app и templates / root_app. Создаём приложение root_app.</p>
+<p>Пишем hw9 / urls.py:</p>
+<inline_code><m_title>hw9 / hw9 / urls.py</m_title><br/>
+from django.conf.urls import url<hl>, include</hl><br/>
+from django.contrib import admin<br/><br/>
+urlpatterns = [<br/>
+<tab></tab>    <hl>url(r'^', include('root_app.urls')),<br/>
+<tab></tab>    #url(r'^accounts/', include('accounts_app.urls')),</hl><br/>
+<tab></tab>    url(r'^admin/', admin.site.urls),<br/>
+]
+</inline_code><br/>
+<p>Подраздел с accounts мы подготовили, но закомментировали - чтобы пока не мешался, мы сейчас будем делать корневую страничку.</p>
+<p>Прописываем корневую страничку</p>
+<inline_code><m_title>hw9 / root_app / urls.py :</m_title><br/>
+<hl>from django.conf.urls import url<br/>
+from django.views.generic import TemplateView<br/><br/>
+urlpatterns = [<br/>
+<tab></tab>    url(r'^$', TemplateView.as_view(template_name='root_app/index.html')),<br/>
+]</hl>
+</inline_code><br/>
+<p>В templates / root_app создаём шаблон index.html:</p>
+<inline_code><m_title>hw9 / templates / root_app / index.html :</m_title><br/>
+<hl>{% extends 'base.html' %}</hl>
+</inline_code><br/>
+<p>Корректируем базовый шаблон base.html:</p>
+<inline_code><m_title>hw9 / templates / base.html :</m_title><br/>
+<hl>{% load static %}</hl><br/>
+&lt;!doctype html><br/>
+&lt;html><br/>
+&lt;head><br/>
+&lt;meta charset="utf-8"/><br/>
+&lt;title>Authenticate&lt;/title><br/>
+&lt;link href="<hl>{% static '</hl>favicon.ico<hl>' %}</hl>" rel="shortcut icon" type="image/x-icon" /><br/>
+&lt;link href="<hl>{% static '</hl>contrib/bootstrap-3.3.7-dist/css/bootstrap.min.css<hl>' %}</hl>" rel="stylesheet"/><br/>
+&lt;script src="<hl>{% static '</hl>contrib/jquery-3.2.1.min.js<hl>' %}</hl>">&lt;/script><br/>
+<hl>{% block includes %}<br/>
+{% endblock %}</hl><br/>
+&lt;/head><br/>
+&lt;body><br/><br/>
+
+&lt;nav class="navbar navbar-default"><br/>
+<tab></tab>&lt;div class="container-fluid"><br/>
+<tab></tab><tab></tab>&lt;div class="navbar-header"><br/>
+<tab></tab><tab></tab><tab></tab>&lt;button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>&lt;span class="sr-only">Toggle navigation&lt;/span><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>&lt;span class="icon-bar">&lt;/span><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>&lt;span class="icon-bar">&lt;/span><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>&lt;span class="icon-bar">&lt;/span><br/>
+<tab></tab><tab></tab><tab></tab>&lt;/button><br/>
+<tab></tab><tab></tab><tab></tab>&lt;a class="navbar-brand" href="#">Тест&lt;/a><br/>
+<tab></tab><tab></tab>&lt;/div><br/>
+<tab></tab><tab></tab>&lt;div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1"><br/>
+<tab></tab><tab></tab><tab></tab>&lt;ul class="nav navbar-nav"><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>&lt;li class="active">&lt;a href="#">111&lt;/a>&lt;/li><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>&lt;li>&lt;a href="#">222&lt;/a>&lt;/li><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>&lt;li>&lt;a href="#">333&lt;/a>&lt;/li><br/>
+<tab></tab><tab></tab><tab></tab>&lt;/ul><br/>
+<tab></tab><tab></tab><tab></tab>&lt;ul class="nav navbar-nav navbar-right"><br/>
+<hl>{% if user.is_authenticated %}</hl><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>&lt;li class="dropdown"><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab><tab></tab>&lt;a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Личный кабинет&lt;span class="caret">&lt;/span>&lt;/a><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab><tab></tab>&lt;ul class="dropdown-menu" role="menu"><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab><tab></tab><tab></tab>&lt;li><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab><tab></tab><tab></tab><tab></tab>&lt;a href="/accounts/logout/?next=/">Выйти&lt;/a><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab><tab></tab><tab></tab>&lt;/li><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab><tab></tab>&lt;/ul><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>&lt;/li><br/>
+<hl>{% else %}</hl><br/>
+<tab></tab>&lt;a href="accounts/login/" class="btn btn-default navbar-btn">Войти&lt;/a><br/>
+<hl>{% endif %}</hl><br/>
+<tab></tab><tab></tab><tab></tab>&lt;/ul><br/>
+<tab></tab><tab></tab>&lt;/div><br/>
+<tab></tab>&lt;/div><br/>
+&lt;/nav><br/>
+<hl>{% block content %}</hl><br/>
+<hl>{% endblock %}</hl><br/>
+&lt;script src="<hl>{% static '</hl>contrib/bootstrap-3.3.7-dist/js/bootstrap.min.js<hl>' %}</hl>">&lt;/script><br/><br/>
+
+&lt;/body><br/>
+&lt;/html><br/>
+</inline_code><br/>
+<p>Теперь, запустив наш сервер, можем наблюдать в браузере шапку с кнопкой "Войти". Если на кнопку "Войти" нажать, то мы уйдём на несуществующую страницу - давайте займёмся этим вопросом.</p>
+<p>Первым делом раскомментируем инклюд на accounts в hw9 / urls.py.</p>
+<inline_code><m_title>hw9 / hw9 / urls.py :</m_title><br/>
+from django.conf.urls import url, include<br/>
+from django.contrib import admin<br/><br/>
+urlpatterns = [<br/>
+<tab></tab>url(r'^', include('root_app.urls')),<br/>
+<tab></tab><hl>url(r'^accounts/', include('accounts_app.urls')),</hl><br/>
+<tab></tab>url(r'^admin/', admin.site.urls),<br/>
+]<br/>
+</inline_code><br/>
+<p>Теперь возникает ошибка сервера - в директории accounts_app нет файла urls.py, на который ссылается hw9 / urls.py. Создаём:</p>
+<inline_code><m_title>hw9 / accounts_app / urls.py :</m_title><br/>
+<hl>from django.conf.urls import url, include<br/><br/>
+urlpatterns = [<br/>
+<tab></tab>url(r'^', include('django.contrib.auth.urls')),<br/>
+]</hl><br/>
+</inline_code><br/>
+<p>Здесь мы подключили сразу ряд вьюх, предоставляемых Django. Это следующие адреса, подключаемые к accounts/ (как мы прописали в hw9 / urls.py):</p>
+<a style="float:right;" href="https://docs.djangoproject.com/en/1.10/topics/auth/default/#module-django.contrib.auth.views" target="_blank">Ссылка на офиц. документацию</a>
+<ul>
+<li>login</li>
+<li>logout</li>
+<li>password_change</li>
+<li>password_reset</li>
+<li>reset</li>
+</ul>
+<p>Для всех этих вьюх нужны шаблоны. Можно указать шаблон при подключении вьюхи, но в таком случае нам придётся прописывать все вьюхи авторизации... Поступим проще - положим наши шаблоны туда, где Django их ищет по умолчанию и обойдёмся одним инклюдом, как мы уже сделали выше.</p>
+<p>По умолчанию Django смотрит шаблоны для своих вьюх авторизации по пути registration / ... в шаблонах.</p>
+<p>Шаблон для login мы переместим из templates / accounts_app в templates / registration и немного подправим. Мы удалим из login.html всё то, что уже есть в базовом шаблоне base.html, и преобразуем страницу в шаблон, наследующий шаблон base.html:</p>
+<inline_code><m_title>hw9 / templates / registration / login.html :</m_title><br/>
+{% extends 'base.html' %}<br/>
+{% load static %}<br/>
+<br/>
+{% block includes %}<br/>
+&lt;link href="{% static 'accounts_app/login.css' %}" rel="stylesheet"/><br/>
+{% endblock %}<br/>
+<br/>
+{% block content %}<br/>
+&lt;div class="container"><br/>
+<tab></tab>&lt;div class="card card-container"><br/>
+{% if form.errors %}<br/>
+<tab></tab><tab></tab>&lt;p>Ваши логин-пароль не подошли. Проверьте, правильно ли вы указали логин и не ошиблись ли с паролем, и повторите попытку.&lt;/p><br/>
+{% endif %}<br/>
+<br/>
+{% if next %}<br/>
+<tab></tab>{% if user.is_authenticated %}<br/>
+<tab></tab><tab></tab>&lt;p>Your account doesn't have access to this page. To proceed, please login with an account that has access.&lt;/p><br/>
+<tab></tab>{% else %}<br/>
+<tab></tab><tab></tab>&lt;p>Please login to see this page.&lt;/p><br/>
+<tab></tab>{% endif %}<br/>
+{% endif %}<br/>
+<tab></tab><tab></tab>&lt;img id="profile-img" class="profile-img-card" src="{% static 'accounts_app/avatar.png'%}" /><br/>
+<tab></tab><tab></tab>&lt;p id="profile-name" class="profile-name-card">&lt;/p><br/>
+<tab></tab><tab></tab>&lt;form class="form-signin" action="{% url 'login' %}" method="post"><br/>
+<tab></tab><tab></tab><tab></tab>{% csrf_token %}<br/>
+<tab></tab><tab></tab><tab></tab>&lt;input type="text" name="username" id="id_username" class="form-control" placeholder="Имя пользователя" maxlength="254" required autofocus><br/>
+<tab></tab><tab></tab><tab></tab>&lt;input type="password" name="password" id="id_password" class="form-control" placeholder="Пароль" required><br/>
+<tab></tab><tab></tab><tab></tab>&lt;button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">Войти&lt;/button><br/>
+<tab></tab><tab></tab>&lt;/form>&lt;!-- /form --><br/>
+<tab></tab><tab></tab>&lt;a href="#" class="forgot-password">Забыли пароль?&lt;/a><br/>
+<tab></tab><tab></tab>&lt;a href="#" class="registration">Регистрация&lt;/a><br/>
+<tab></tab>&lt;/div>&lt;!-- /card-container --><br/>
+&lt;/div>&lt;!-- /container --><br/>
+{% endblock %}<br/>
+</inline_code><br/><br/>
+<p>Чтобы проверить, что всё ok, мы должны сгенерировать необходимые структуры в базе данных и завести учётку суперпользователя.</p>
+<inline_code>
+<m_title>hw9 / hw9 / settings.py :</m_title><br/>
+....<br/>
+# Application definition<br/>
+<br/>
+INSTALLED_APPS = [<br/>
+<tab></tab>   'django.contrib.admin',<br/>
+<tab></tab>   'django.contrib.auth',<br/>
+<tab></tab>   'django.contrib.contenttypes',<br/>
+<tab></tab>   'django.contrib.sessions',<br/>
+<tab></tab>   'django.contrib.messages',<br/>
+<tab></tab>   'django.contrib.staticfiles',<br/>
+<tab></tab><hl>   'root_app.apps.RootAppConfig',</hl><br/>
+<tab></tab><hl>   'accounts_app.apps.AccountsAppConfig',</hl><br/>
+]<br/>
+....
+</inline_code><br/>
+<inline_code><m_title>Коммандная строка :</m_title><br/>
+<shell_welcome>hw9 $ </shell_welcome> python manage.py makemigrations<br/>
+<shell_welcome>hw9 $ </shell_welcome> python manage.py migrate<br/>
+<shell_welcome>hw9 $ </shell_welcome> python manage.py createsuperuser<br/>
+</inline_code><br/>
+<p>Заходим на нашу страничку. Жмём "Войти". Вводим наши суперпользовательские логин-пароль. Если опечатались, высветится предложение повторить попытку. А вот если логин-пароль введены правильно, то вы вернётесь на корневую страничку, где вместо кнопки "Войти" находится выпадающее меню "Личный кабинет". Выбираем в "Личном кабинете" пункт "Выйти". И вот она снова - кнопка "Войти".</p>
+<p>Идём дальше. У нашего пользователя нет своей учётки. Надо предоставить возможность ему зарегистрироваться в нашем веб-приложении.</p>
+<p>Расширим класс User. <a href="https://simpleisbetterthancomplex.com/tutorial/2016/07/22/how-to-extend-django-user-model.html" target="_blank">Здесь</a> описаны варианты, как можно расширить класс User. Мы поступим следующим образом: определим класс Profile и подпишемся на сигнал "post_save" от класса User.</p>
+<inline_code><m_title>hw9 / accounts_app / models.py :</m_title><br/>
+from django.db import models<br/>
+from django.contrib.auth.models import User<br/>
+from django.db.models.signals import post_save<br/>
+from django.dispatch import receiver<br/><br/>
+# Create your models here.<br/>
+class Profile(models.Model):<br/>
+<tab></tab>user = models.OneToOneField(User, on_delete=models.CASCADE)<br/>
+<tab></tab>email_confirmed = models.BooleanField(default=False)<br/>
+<tab></tab># other fields...<br/><br/>
+@receiver(post_save, sender=User)<br/>
+def update_user_profile(sender, instance, created, **kwargs):<br/>
+<tab></tab>if created:<br/>
+<tab></tab><tab></tab>Profile.objects.create(user=instance)<br/>
+<tab></tab>instance.profile.save()<br/>
+</inline_code><br/>
+<p>Создаём файл tokens.py:</p>
+<inline_code><m_title>hw9 / accounts_app / tokens.py :</m_title><br/>
+from django.contrib.auth.tokens import PasswordResetTokenGenerator<br/>
+from django.utils import six<br/><br/>
+class AccountActivationTokenGenerator(PasswordResetTokenGenerator):<br/>
+<tab></tab>def _make_hash_value(self, user, timestamp):<br/>
+<tab></tab><tab></tab>return (<br/>
+<tab></tab><tab></tab><tab></tab>six.text_type(user.pk) /static/tab_apps/django/html/text/ six.text_type(timestamp) /static/tab_apps/django/html/text/<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>six.text_type(user.profile.email_confirmed)<br/>
+<tab></tab><tab></tab>)<br/><br/>
+account_activation_token = AccountActivationTokenGenerator()<br/>
+</inline_code><br/>
+<p>Про токены написано <a href="https://simpleisbetterthancomplex.com/tutorial/2016/08/24/how-to-create-one-time-link.html" target="_blank">здесь</a>.</p>
+
+<p>Сейчас мы должны расширить класс формы регистрации пользователя таким образом, чтобы там было поле "Электронная почта".</p>
+<inline_code><m_title>hw9 / accounts_app / forms.py :</m_title><br/>
+#-*- coding: utf-8 -*-<br/>
+from django import forms<br/>
+from django.contrib.auth.forms import UserCreationForm<br/>
+from django.contrib.auth.models import User<br/><br/>
+class SignUpForm(UserCreationForm):<br/>
+<tab></tab>email = forms.EmailField(max_length=254, help_text=u'Обязательно укажите действующий адрес эл. почты.', label=u'Эл. почта')<br/><br/>
+<tab></tab>class Meta:<br/>
+<tab></tab><tab></tab>model = User<br/>
+<tab></tab><tab></tab>fields = ('username', 'email', 'password1', 'password2', )<br/>
+</inline_code><br/>
+<p>Теперь идём в views.py и пишем вьюху для регистрации нового пользователя:</p>
+<inline_code><m_title>hw9 / accounts_app / views.py :</m_title><br/>
+#-*- coding: utf-8 -*-<br/>
+from django.http import HttpResponse #<br/>
+from django.contrib.sites.shortcuts import get_current_site<br/>
+from django.shortcuts import render, redirect<br/>
+from django.utils.encoding import force_bytes<br/>
+from django.utils.http import urlsafe_base64_encode<br/>
+from django.template.loader import render_to_string<br/>
+from .forms import SignUpForm<br/>
+from .tokens import account_activation_token<br/><br/>
+def signup(request):<br/>
+<tab></tab>if request.method == 'POST':<br/>
+<tab></tab><tab></tab>form = SignUpForm(request.POST)<br/>
+<tab></tab><tab></tab>if form.is_valid():<br/>
+<tab></tab><tab></tab><tab></tab>user = form.save(commit=False)<br/>
+<tab></tab><tab></tab><tab></tab>user.is_active = False<br/>
+<tab></tab><tab></tab><tab></tab>user.save()<br/>
+<tab></tab><tab></tab><tab></tab>current_site = get_current_site(request)<br/>
+<tab></tab><tab></tab><tab></tab>subject = u'Активируйте вашу учётную запись'<br/>
+<tab></tab><tab></tab><tab></tab>message = render_to_string('accounts_app/account_activation_email.html', {<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>'user': user,<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>'domain': current_site.domain,<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>'uid': urlsafe_base64_encode(force_bytes(user.pk)),<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>'token': account_activation_token.make_token(user),<br/>
+<tab></tab><tab></tab><tab></tab>})<br/>
+<tab></tab><tab></tab><tab></tab>user.email_user(subject, message)<br/>
+<tab></tab><tab></tab><tab></tab>return redirect('account_activation_sent')<br/>
+<tab></tab>else:<br/>
+<tab></tab><tab></tab>form = SignUpForm()<br/>
+<tab></tab>return render(request, 'accounts_app/signup.html', {'form': form})<br/>
+def account_activation_sent(request):<br/>
+<tab></tab>return HttpResponse('account activation sent')<br/>
+</inline_code><br/>
+<p>Мы предоставляем форму, считываем введённые пользователем данные, сохраняем их и посылаем пользователю письмо со ссылкой активации учётной записи.</p>
+<p>Какие шаблоны нам нужны:</p><ul>
+<li>accounts_app / signup.html</li>
+<li>accounts_app / account_activation_email.html</li>
+</ul>
+<p>Вот они:</p>
+<inline_code><m_title>hw9 / templates / accounts_app / signup.html :</m_title><br/>
+{% extends 'base.html' %}<br/><br/>
+{% block content %}<br/>
+<tab></tab>&lt;h2>Регистрация нового пользователя&lt;/h2><br/>
+<tab></tab>&lt;form method="post"><br/>
+<tab></tab><tab></tab>{% csrf_token %}<br/>
+<tab></tab><tab></tab>{{ form.as_p }}<br/>
+<tab></tab><tab></tab>&lt;button type="submit">Зарегистрировать&lt;/button><br/>
+<tab></tab>&lt;/form><br/>
+{% endblock %}<br/>
+</inline_code><br/>
+
+<inline_code><m_title>hw9 / templates / accounts_app / account_activation_email.html :</m_title><br/>
+{% autoescape off %}<br/>
+Здорово, {{ user.username }}!<br/><br/>
+Для активации вашей учётной записи вам необходимо перейти по следующей ссылке:<br/><br/>
+http://{{ domain }}{% url 'activate' uidb64=uid token=token %} <span style="color:#888;"># в urls.py третьим параметром задаётся "имя" url-а - здесь это 'activate'</span><br/>
+{% endautoescape %}<br/>
+</inline_code><br/>
+<p>На время разработки (и только на время разработки!) в hw9 / hw9 / settings необходимо добавить строчку</p>
+<inline_code>EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'</inline_code>
+<p>С этой строчкой всё то, что ваше веб-приложение "отправляет на почту", выводится в консоли сервера, а не отправляется реально.</p>
+<p>Когда сайт запускается в эксплуатацию, необходимо настроить соединение с почтовым сервером:</p>
+<inline_code><m_title>hw9 / hw9 / settings.py :</m_title><br/>
+EMAIL_USE_TLS = True<br/>
+DEFAULT_FROM_EMAIL = 'Команда разработчиков hw9 &lt;noreply@rambler.ru>'<br/>
+EMAIL_HOST = 'smtp.rambler.ru'<br/>
+EMAIL_PORT = 465<br/>
+EMAIL_HOST_USER = 'test_user'<br/>
+EMAIL_HOST_PASSWORD = 'my_beatiful_password'<br/>
+</inline_code>
+<p><a href="https://simpleisbetterthancomplex.com/tutorial/2016/06/13/how-to-send-email.html" target="_blank">Здесь</a> описан сервис для "промышленной" отсылки писем от лица вашего сайта.</p>
+
+<p>В urls.py прописываем пути:</p>
+<inline_code><m_title>hw9 / accounts_app / urls.py :</m_title><br/>
+from django.conf.urls import url, include<br/>
+from . import views<br/><br/>
+urlpatterns = [<br/>
+<tab></tab>url(r'^', include('django.contrib.auth.urls')),<br/>
+<tab></tab>url(r'^signup/$', views.signup),<br/>
+<tab></tab>url(r'^account_activation_sent/$', views.account_activation_sent, name='account_activation_sent'),<br/>
+<tab></tab>url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]/static/tab_apps/django/html/text/)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', views.activate, name='activate'),<br/>
+]<br/>
+</inline_code><br/>
+<p>В views.py добавляем недостающую вьюху activate:</p>
+<inline_code><m_title>hw9 / accounts_app / views.py :</m_title><br/>
+#-*- coding: utf-8 -*-<br/>
+<span style="text-decoration:line-through;">from django.http import HttpResponse #</span><br/>
+<hl>from django.contrib.auth import login<br/>
+from django.contrib.auth.models import User</hl><br/>
+from django.contrib.sites.shortcuts import get_current_site<br/>
+from django.shortcuts import render, redirect<br/>
+from django.utils.encoding import force_bytes<br/>
+from django.utils.http import urlsafe_base64_encode<br/>
+<hl>from django.utils.http import urlsafe_base64_decode<br/>
+from django.utils.encoding import force_text</hl><br/>
+from django.template.loader import render_to_string<br/>
+from .forms import SignUpForm<br/>
+from .tokens import account_activation_token<br/><br/>
+def signup(request):<br/>
+<tab></tab>if request.method == 'POST':<br/>
+<tab></tab><tab></tab>form = SignUpForm(request.POST)<br/>
+<tab></tab><tab></tab>if form.is_valid():<br/>
+<tab></tab><tab></tab><tab></tab>user = form.save(commit=False)<br/>
+<tab></tab><tab></tab><tab></tab>user.is_active = False<br/>
+<tab></tab><tab></tab><tab></tab>user.save()<br/>
+<tab></tab><tab></tab><tab></tab>current_site = get_current_site(request)<br/>
+<tab></tab><tab></tab><tab></tab>subject = u'Активируйте вашу учётную запись'<br/>
+<tab></tab><tab></tab><tab></tab>message = render_to_string('accounts_app/account_activation_email.html', {<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>'user': user,<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>'domain': current_site.domain,<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>'uid': urlsafe_base64_encode(force_bytes(user.pk)),<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>'token': account_activation_token.make_token(user),<br/>
+<tab></tab><tab></tab><tab></tab>})<br/>
+<tab></tab><tab></tab><tab></tab>user.email_user(subject, message)<br/>
+<tab></tab><tab></tab><tab></tab>return redirect('account_activation_sent')<br/>
+<tab></tab>else:<br/>
+<tab></tab><tab></tab>form = SignUpForm()<br/>
+<tab></tab>return render(request, 'accounts_app/signup.html', {'form': form})<br/>
+def account_activation_sent(request):<br/>
+<tab></tab><span style="text-decoration:line-through;">return HttpResponse('account activation sent')</span><br/>
+<tab></tab><hl>return render(request, 'accounts_app/account_activation_sent.html')</hl><br/>
+<hl>def activate(request, uidb64, token):<br/>
+<tab></tab>try:<br/>
+<tab></tab><tab></tab>uid = force_text(urlsafe_base64_decode(uidb64))<br/>
+<tab></tab><tab></tab>user = User.objects.get(pk=uid)<br/>
+<tab></tab>except (TypeError, ValueError, OverflowError, User.DoesNotExist):<br/>
+<tab></tab><tab></tab>user = None<br/><br/>
+<tab></tab>if user is not None and account_activation_token.check_token(user, token):<br/>
+<tab></tab><tab></tab>user.is_active = True<br/>
+<tab></tab><tab></tab>user.profile.email_confirmed = True<br/>
+<tab></tab><tab></tab>user.save()<br/>
+<tab></tab><tab></tab>login(request, user)<br/>
+<tab></tab><tab></tab>return redirect('/')<br/>
+<tab></tab>else:<br/>
+<tab></tab><tab></tab>return render(request, 'accounts_app/activation_failed.html')</hl><br/>
+</inline_code><br/>
+<p>Какие шаблоны нам нужны:</p><ul>
+<li>accounts_app/account_activation_sent.html</li>
+<li>accounts_app/activation_failed.html</li>
+</ul>
+<p>Вот они:</p>
+<inline_code><m_title>hw9 / templates / accounts_app / account_activation_sent.html :</m_title><br/>
+{% extends 'base.html' %}<br/><br/>
+{% block content %}<br/><br/>
+&lt;h6>Вам на почтовый ящик отправлено письмо со ссылкой активации вашей учётной записи.&lt;/h6><br/><br/>
+{% endblock %}<br/>
+</inline_code><br/>
+<inline_code><m_title>hw9 / templates / accounts_app / activation_failed.html :</m_title><br/><br/>
+{% extends 'base.html' %}<br/><br/>
+{% block content %}<br/><br/>
+&lt;h6>Активации вашей учётной записи не произошло. Попробуйте зарегистрироваться ещё раз.&lt;/h6><br/><br/>
+{% endblock %}<br/>
+</inline_code><br/>
+<p>Ну вот. Наши пользователи могут зарегистрироваться и авторизоваться в нашем веб-приложении. Попробуем войти под учёткой суперпользователя. Чего?!! Мы не можем зайти. У нас возникает ошибка сервера "RelatedObjectDoesNotExist at /accounts/login/ : User has no profile". Дело в том, что мы создавали учётку суперпользователя тогда, когда у нас ещё не было профилей (мы же теперь расширили класс User). Вариантов у нас два: добавить проверку, что у пользователя есть профиль, и просто почистить базу данных и завести всех пользователей заново.</p>
+<p>Так как мы свой проект ещё не опубликовали, то сбросим все данные и заведём нужных пользователей заново.</p>
+<inline_code><m_title>Командная строка :</m_title><br/>
+<shell_welcome>hw9 $ </shell_welcome>python manage.py flush<br/>
+<shell_welcome>hw9 $ </shell_welcome>python manage.py createsuperuser<br/>
+</inline_code><br/>
+<p>Зарегистрировать пользователя мы можем. Для полноты авторизационного комплекта не хватает только механизма сброса пароля. Я делал сброс пароля по <a href="https://simpleisbetterthancomplex.com/tutorial/2016/09/19/how-to-create-password-reset-view.html" target="_blank">вот этому вот</a> руководству.</p>
+<p>Напоминаю, что Django-вский комплект вьюх авторизации у нас уже подключен. Нам осталось только "скормить" им нужные нам шаблоны.</p>
+<p>У нас сейчас есть шаблон login.html в виде окошка на сером фоне. Предлагаю сделать свой базовый шаблон для шаблонов авторизации - окошко на сером фоне. Сделаем его из login.html. Поехали!</p>
+<inline_code><m_title>hw9 / templates / accounts_app / auth_base.html :</m_title><br/>
+{% extends 'base.html' %}<br/>
+{% load static %}<br/>
+<br/>
+{% block includes %}<br/>
+&lt;link href="{% static 'accounts_app/login.css' %}" rel="stylesheet"/><br/>
+{% endblock %}<br/>
+<br/>
+{% block content %}<br/>
+&lt;div class="container"><br/>
+<tab></tab><tab></tab>&lt;div class="card card-container"><br/>
+{% if form.errors %}<br/>
+{% block err %}{% endblock %}<br/>
+<br/>
+{% endif %}<br/>
+<br/>
+{% if next %}<br/>
+<tab></tab>{% if user.is_authenticated %}<br/>
+<tab></tab>&lt;p>У вашей учётной записи нет прав доступа к странице. Для доступа к странице авторизуйтесь под другим пользователем.&lt;/p><br/>
+<tab></tab>{% else %}<br/>
+<tab></tab>&lt;p>Please login to see this page.&lt;/p><br/>
+<tab></tab>{% endif %}<br/>
+{% endif %}<br/>
+<tab></tab><tab></tab><tab></tab>&lt;img id="profile-img" class="profile-img-card" src="{% static 'accounts_app/avatar.png'%}" /><br/>
+<tab></tab><tab></tab><tab></tab>&lt;p id="profile-name" class="profile-name-card">&lt;/p><br/>
+<tab></tab><tab></tab><tab></tab>{#&lt;form class="form-signin" action="{% url 'login' %}" method="post">#}<br/>
+<tab></tab><tab></tab><tab></tab>&lt;form class="form-signin" action="" method="post"><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>{% csrf_token %}<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>{% block auth_content %}<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>{% endblock %}<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>{% block bn %}<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>&lt;button class="btn btn-lg btn-primary btn-block btn-signin" type="submit"><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab><tab></tab>{% block bn_text %}{% endblock %}<br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>&lt;/button><br/>
+<tab></tab><tab></tab><tab></tab><tab></tab>{% endblock %}<br/>
+<tab></tab><tab></tab><tab></tab>&lt;/form>&lt;!-- /form --><br/>
+<tab></tab><tab></tab><tab></tab>{% block after %}<br/>
+<tab></tab><tab></tab><tab></tab>&lt;a href="/accounts/password_reset/" class="forgot-password">Забыли пароль?&lt;/a><br/>
+<tab></tab><tab></tab><tab></tab>&lt;a href="/accounts/signup/" class="signup">Регистрация&lt;/a><br/>
+<tab></tab><tab></tab><tab></tab>{% endblock %}<br/>
+<tab></tab><tab></tab>&lt;/div>&lt;!-- /card-container --><br/>
+<tab></tab>&lt;/div>&lt;!-- /container --><br/>
+{% endblock %}<br/>
+</inline_code><br/>
+<p>Сам же login.html у нас теперь будет таким:</p>
+<inline_code><m_title>hw9 / templates / registration / login.html :</m_title><br/>
+{% extends 'accounts_app/auth_base.html' %}<br/>
+{% load static %}<br/>
+<br/>
+{% block err %}<br/>
+&lt;p>Ваши логин-пароль не подошли. Проверьте, правильно ли вы указали логин и не ошиблись ли с паролем, и повторите попытку.&lt;/p><br/>
+{% endblock %}<br/>
+<br/>
+{% block auth_content %}<br/>
+&lt;span id="reauth-email" class="reauth-email">&lt;/span><br/>
+&lt;input type="text" name="username" id="id_username" class="form-control" placeholder="Имя пользователя" maxlength="254" required autofocus/><br/>
+&lt;input type="password" name="password" id="id_password" class="form-control" placeholder="Пароль" required/><br/>
+{% endblock %}<br/>
+<br/>
+{% block bn_text %}Войти{% endblock %}<br/>
+</inline_code><br/>
+
+<p>Вот список шаблонов, которые нам необходимо создать:</p>
+<table>
+<col></col>
+<col style="color:red;"></col>
+<tr><td>registration/password_reset_form.html</td>      <td>Форма, на которой пользователь указывает e-mail, на который высылать ссылку, по которой можно задать новый пароль</td></tr>
+<tr><td>registration/password_reset_subject.txt</td>    <td>Тема для письма с ссылкой на задание нового пароля (не может содержать переносов строк!)</td></tr>
+<tr><td>registration/password_reset_email.html</td>     <td>Текст письма с ссылкой на задание нового пароля</td></tr>
+<tr><td>registration/password_reset_done.html</td>      <td>Форма с уведомлением "На указанный вами почтовый ящик отправлена ссылка"</td></tr>
+<tr><td>registration/password_reset_confirm.html</td>   <td>Форма задания пароля</td></tr>
+<tr><td>registration/password_reset_complete.html</td>  <td>Уведомление о том, что новый пароль вступил в силу, и предложение залогиниться</td></tr>
+</table>
+<p>Создаём:</p>
+
+<inline_code><m_title>registration / password_reset_form.html :</m_title><br/>
+{% extends 'accounts_app/auth_base.html' %}<br/>
+{% load static %}<br/>
+<br/>
+{% block auth_content %}<br/>
+&lt;h3>Укажите эл. почту&lt;/h3><br/>
+&lt;p>на которую отправить ссылку на страницу установления нового пароля.&lt;/p><br/>
+&lt;span id="reauth-email" class="reauth-email">&lt;/span><br/>
+&lt;input type="email" name="email" id="id_email" class="form-control" placeholder="Эл. почта" required/><br/>
+{#{{form.as_p}}#}<br/>
+{% endblock %}<br/>
+<br/>
+{% block bn_text %}Отправить{% endblock %}<br/>
+</inline_code><br/>
+
+<inline_code><m_title>registration / password_reset_subject.txt :</m_title><br/>
+Сброс пароля для hw9
+</inline_code><br/>
+
+<inline_code><m_title>registration / password_reset_email.html :</m_title><br/>
+{% autoescape off %}<br/>
+Для того, чтобы задать новый пароль для пользователя {{ user.get_username }} на сайте hw9 перейдите по следующей ссылке:<br/>
+<br/>
+{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}<br/>
+<br/>
+С уважением,<br/>
+команда сайта hw9.<br/>
+{% endautoescape %}<br/>
+</inline_code><br/>
+
+<inline_code><m_title>registration / password_reset_done.html :</m_title><br/>
+{% extends 'accounts_app/auth_base.html' %}<br/>
+{% load static %}<br/>
+<br/>
+{% block auth_content %}<br/>
+&lt;p>На указанный вами почтовый ящик отправлена ссылка, пройдя по которой вы сможете задать новый пароль&lt;/p><br/>
+&lt;p>Если вы не получили письмо, пожалуйста, убедитесь, что указали тот же адрес эл. почты, что указывали при регистрации на этом сайте.&lt;/p><br/>
+{% endblock %}<br/>
+<br/>
+{% block bn %}{% endblock %}<br/>
+{% block after %}{% endblock %}<br/>
+</inline_code><br/>
+
+<inline_code><m_title>registration / password_reset_confirm.html :</m_title><br/>
+{% extends 'accounts_app/auth_base.html' %}<br/>
+<br/>
+{% block err %}<br/>
+&lt;p>Некорректный пароль.&lt;/p><br/>
+{% endblock %}<br/>
+<br/>
+{% block auth_content %}<br/>
+{% if validlink %}<br/>
+<tab></tab>&lt;h3>Задайте пароль&lt;/h3><br/>
+<tab></tab>&lt;input type="password" name="new_password1" id="id_new_password1" class="form-control" placeholder="Введите пароль" required/><br/>
+<tab></tab>&lt;input type="password" name="new_password2" id="id_new_password2" class="form-control" placeholder="Введите пароль ещё раз" required/><br/>
+<tab></tab>&lt;p>Пароль не должен содержать персональных данных, представлять какое одно словарное слово, не может быть чисто числовым, должен содержать как минимум 8 символов.&lt;/p><br/>
+<tab></tab>{#{{ form.as_p }}#}<br/>
+{% else %}<br/>
+<tab></tab>&lt;p><br/>
+<tab></tab><tab></tab>Вы перешли по некорректной ссылке. Возможно, вы по ней уже заходили.<br/>
+<tab></tab><tab></tab>Если надо, запросите сброс пароля ещё раз.<br/>
+<tab></tab>&lt;/p><br/>
+{% endif %}<br/>
+{% endblock %}<br/>
+<br/>
+{% block bn %}<br/>
+{% if validlink %}<br/>
+<tab></tab>&lt;button class="btn btn-lg btn-primary btn-block btn-signin" type="submit">Применить&lt;/button><br/>
+{% else %}<br/>
+{% endif %}<br/>
+{% endblock %}<br/>
+{% block after %}{% endblock %}<br/>
+</inline_code><br/>
+
+<inline_code><m_title>registration / password_reset_complete.html :</m_title><br/>
+{% extends 'accounts_app/auth_base.html' %}<br/>
+<br/>
+{% block auth_content %}<br/>
+<tab></tab>&lt;p><br/>
+<tab></tab><tab></tab>Пароль успешно обновлён. Теперь можно &lt;a href="{%url 'login'%}">войти&lt;/a><br/>
+<tab></tab>&lt;/p><br/>
+{% endblock %}<br/>
+{% block bn %}{% endblock %}<br/>
+{% block after %}{% endblock %}<br/>
+</inline_code><br/>
+<p>Ну вот, теперь пользователь может зарегистрироваться, залогиниться, сбросить пароль. А ещё, так как мы Django-вские авторизационные вьюхи подключали пакетом сразу все, пользователю также доступна смена пароля на дефолтных шаблонах. Мне кажется, если уж мы не задали для этого свои шаблоны, то должны заблокировать такую возможность. Для этого прописываем в hw9 / accounts_app / urls.py:</p>
+<inline_code><m_title>hw9 / accounts_app / urls.py :</m_title><br/>
+from django.conf.urls import url, include<br/>
+from . import views<br/>
+from django.contrib.auth import views as auth_views<br/>
+<hl>from django.views.defaults import page_not_found</hl><br/>
+<br/>
+urlpatterns = [<br/>
+<tab></tab><hl>url(r'^password_change/', page_not_found, {'exception': Exception('Not Found')}),</hl><br/>
+<tab></tab>url(r'^', include('django.contrib.auth.urls')),<br/>
+<tab></tab>url(r'^signup/$', views.signup),<br/>
+<tab></tab>url(r'^account_activation_sent/$', views.account_activation_sent, name='account_activation_sent'),<br/>
+<tab></tab>url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]/static/tab_apps/django/html/text/)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',<br/>
+<tab></tab><tab></tab>views.activate, name='activate'),<br/>
+]<br/>
+</inline_code><br/>
+<p>То, что мы новый url добавили в начало, а не в конец, принципиально важно - дело в том, что далее следует иклюд, под который password_change тоже попадает.</p>
+
+<h2>Hello World №10: Разворачиваем проект по протоколу HTTPS (с использованием услуг хостинга)</h2>
+<p>Допустим, у нас есть некий проект, который мы хотим разместить в интернете. Пусть это будет наш проект hw3. Если у вас (вдруг!) нет исходников, <a href="/static/tab_apps/django/html/text/data/hw10/hw3.tar.gz" download>скачайте</a> их и распакуйте командой "tar -xf hw3.tar.gz" (в результате появится папочка hw3 с проектом).</p>
+<p>Размещать проект будем на сайте <a href="https://fullspace.ru/?pnum=18189" target="_blank">fullspace.ru</a> . Зарегистрируемся на этом сайте. Нам будет предложен тестовый период (бесплатный) 7 дней, в течение которого мы должны будем оплатить хостинг в соответствии с выбранным тарифным планом. Самый дешёвый тариф - "Single Space" - 80р./месяц. Нам необходимо сделать следующие вещи:</p>
+<ul>
+<li>Зарегистрировать домен (по какому адресу будет располагаться наш сайт)</li>
+<li>Настроить ssh-соединение с удалённой машиной</li>
+<li>Установить в рабочую директорию заготовку Django-проекта</li>
+<li>Перенести наш проект в ту заготовку</li>
+<li>Заказать в технической поддержке перевод сайта на HTTPS.</li>
+</ul>
+
+<span style="color:#888;">Текст находится в разработке...</span>
+<inline_code><m_title></m_title><br/>
+</inline_code><br/>
+
+<h2>Hello World №11: Делаем так, чтобы поисковые системы подцепляли наш сайт (т.н. SEO-оптимизация)</h2>
+<span style="color:#888;">Текст находится в разработке...</span>
+
+<h2>Hello World №12: Общие для разных приложений модели</h2>
+<span style="color:#888;">Текст находится в разработке...</span>
+
+<h2>Hello World №13: Переход на использование сторонней базы данных</h2>
+<span style="color:#888;">Текст находится в разработке...</span>
+
+<h2>Hello World №14: Механизм кэширования страниц Django</h2>
+<span style="color:#888;">Текст находится в разработке...</span>
+
+<h2>Hello World №15: Пишем первое мобильное веб-приложение</h2>
+<span style="color:#888;">Текст находится в разработке...</span>
+
+<h2>Hello World №16: Выдача контента в зависимости от браузера</h2>
+<span style="color:#888;">Текст находится в разработке...</span>
+
+<h2 style="color:#f80;text-align:center;">~ ~ ~ Вдруг возникшие вопросы ~ ~ ~</h2>
+<h2>Вопросы отладки</h2>
+<p>Здесь мы рассмотрим вопросы, связанные с отладкой приложения, в котором нет авторизации, ибо это значительно всё усложняет и заставляет программиста использовать творческий подход.</p>
+<p>Допустим, мы уже написали некий проект. Всё, вроде, прописали, но что-то не работает. Давайте разбираться, что может быть не так.</p>
+<p>Не грузится страничка (например, при AJAX-запросе не можем получить ответ). Прежде чем искать косяк, проверьте, действительно ли страничка не грузится. Откройте новую вкладку в браузере, и перейдите на ту страничку, где вы ожидаете увидеть ответ. Если там что-то есть, значит, вы <span style="text-decoration:underline;">не туда делаете запрос</span>, или ещё может быть такое, что вы <span style="text-decoration:underline;">делаете что-то не то с полученными данными</span>, и надо смотреть в сторону последующей обработки данных, а не туда, почему данных нет, ибо данные есть.</p>
+<p>Если странички всё-таки нет. Посмотрите urls.py приложения (app), а также urls.py проекта, куда приложение инклюдится. Если все urls.py корректны, и ошибка в самой вьюхе, то консоль отладочного сервера Django должна ругаться со страшной силой, и корень зла надо искать по сообщениям той ругани.</p>
+<p>Теперь, собственно, о выводе в консоль.</p>
+<p>Следует чётко различать клиентскую и серверную части. Клиентская часть представлена JavaScript-ом, а серверная - Django(python).</p>
+<p>В js-файлах для вывода в консоль достаточно написать console.log("Привет! Я со странички!"). Консольный вывод следует смотреть в консоли браузера - не той консоли, из которой, возможно, вы браузер запустили, а из той консоли, которая появляется по нажатии <span style="padding:2px;border:1px solid #888;border-radius: 5px;">Ctrl /static/tab_apps/django/html/text/ Shift /static/tab_apps/django/html/text/ I</span>. Если вам посчастливилось отлаживать сайт на смартфоне (да уж, нелёгкая участь...), то вам может помочь вывод всплывающих сообщений: alert("Привет! Я со странички!"), а вообще - думаю, <span style="background:#af0;";>в мой фреймворк b.js надо добавить</span> опцию захвата всего консольного вывода приложения в отладочный виджет (см. <a href="https://stackoverflow.com/questions/11403107/capturing-javascript-console-log">сюда</a> и <a href="https://developer.mozilla.org/en/docs/Web/API/console">сюда</a>). Ещё есть <a href="https://jsconsole.com/" target="_blank">решение</a> для перехвата консольного вывода в мобильных браузерах - немного геморройное(у меня регярно отваливалось соединение), но работает. <span style="color:#888;">Для тех, кто захочет попробовать - откройте новую вкладку в моб. браузере, зайдите на указанные в ссылке сайт, наберите ":listen"(без кавычек) и следуйте инструкциям (надо будет добавить отображённую строку в HTML-код вашего веб-приложения, обновить вашу страничку на мобиле, и на вкладке с jsconsole.com пойдёт консольный вывод из вашего моб. браузера).</span></p>
+<p>Да, кстати! Не забывайте писать 'use strict'; в начале каждого js-файла (а весь код старайтесь писать в js-файлах, а не встраивать в HTML) - тогда браузер будет выявлять случаи обращения к несуществующим переменным и вообще будет вам писать об ошибках в консоль. Если эта строчка пойдёт в production, думаю, ничего страшного не будет.</p>
+<p>Если вы используете "подписчик-издатель состояний" из моего фреймворка (классы B.StatePublisher и B.StateSubscriber), то я настоятельно рекоммендую на время разработки включить в страничку отладочный виджет B.StateDebugWidget, который отображает в режиме реального времени состояние странички, а также позволяет вносить правки в это состояние - см. <a href="/static/tab_apps/django/html/text/data/hw6/index_html" target="_blank">пример</a> из Hello World №6.</p>
+<p>Когда я накидываю структуру виджетов, я обычно каждому виджету (B.Widget) устанавливаю пустой контент с уникальным цветом фона - например, setContent(undefined, '#f00') - так на этапе, когда у вас ещё не подключены компоненты, уже видно, где что должно будет появиться.</p>
+<p>Прежде чем добавлять js-компонент в Django-проект, я его проверяю на отдельной тестовой страничке (т.е. пишу страничку как файл и запускаю в браузере прямо из файловой системы). Браузер Firefox (проверял только в linux-е) позволяет также подгружать данные из локальных файлов по AJAX. Chrome, если запускать без специальных ключей, НЕ позволяет грузить по AJAX локальные данные.</p>
+<p>Если вы хотите посмотреть структуру нагенерированного кода HTML, то там же, где и консоль, есть вкладка "Dom and Style Inspector"(firefox, аналогичная есть и вдругих десктопных браузерах) - она вам и HTML-код покажет, и подсветит на страничке элементы, соответствующие коду под курсором, и даже позволит прям в браузере подкорректировать HTML-код, и посмотреть, как изменится отображение.</p>
+<p>В python-е с выводом в консоль немного сложнее... - тут надо настраивать settins.py. Мой излюбленный приём - во вьюхе писать сначала отладочный вывод, и лишь затем то, что нужно. Настойки для включения консоли см. <a href="https://djbook.ru/ch02s06.html" target="_blank">здесь</a>. Про данную ссылку - я не проверял, так что буду признателен за отзывы. Обращаю ваше внимание, что по умолчанию вывод в консоль в Django-проектах скрыт.</p>
+<p>Ещё пару слов скажу на предмет кроссбраузерности кода - не используйте метод includes() типа String (он работает только в Firefox-е и в Chrome), не используйте синхронную AJAX-загрузку (а только асинхронную, всегда), используйте addEventListener() всесто методов типа onclick(). Полезно смотреть результирующее веб-приложение в браузерах Internet Explorer и (если мобильная версия вам тоже интересна) Android Browser(в Android он установлен по умолчанию) - это самые капризные браузеры, и в них вылезают те ошибки, которые частично могут вылезти в других браузерах. Будьте осторожны со стилями CSS - там, конечно, много интересных фишечек, но они ведут себя совершенно по-разному в разных браузерах (в частности, в Internet Explorer не работает position:fixed), см. <a href="http://www.positioniseverything.net/" target="_blank">сюда</a> и <a href="https://habrahabr.ru/post/189118/" target="_blank">сюда</a>, чтобы понять всю серьёзность проблемы.</p>
+
+<h2>Содержимое фреймворка B(b.js)</h2>
+<p>Ниже приводится список классов и функций, входящих во фреймворк b.js. Детали использования (параметры, методы) см. в самом b.js, примеры использования... - см. HelloWorld-ы в тексте.</p>
+<table>
+<tr>
+    <td>B.StatePublisher</td>
+    <td>Класс, который слушает подписчиков на предмет изменения состояния и оповещает всех подписчиков, если кто-то из них изменил состояние.</td>
+</tr><tr>
+    <td>B.StateSubscriber</td>
+    <td>Базовый класс для подписчика на изменения состояния</td>
+</tr><tr>
+    <td>B.StateDebugWidget</td>
+    <td>Отладочный виджет, который отображает состояние, а также позволяет менять его</td>
+</tr><tr>
+    <td>B.Widget</td>
+    <td>Виджет. Вообще-то, это контейнер. Установите сюда (метод setContent) другой виджет(Strip или Stack) или элемент DOM-модели.</td>
+</tr><tr>
+    <td>B.Strip</td>
+    <td>Лэйаут. Горизонтальный или вертикальный в зависимости от переданного в конструкторе параметра</td>
+</tr><tr>
+    <td>B.Stack</td>
+    <td>Контейнер для виджетов, расположенных один поверх другого</td>
+</tr><tr>
+    <td>B.ajax</td>
+    <td>Функция для AJAX-запросов. Имеется поддержка таймаута и вызов переданного параметром обработчика в случае ошибки. Вызов справки: B.ajax();</td>
+</tr><tr>
+    <td>B.checkVisible</td>
+    <td>Функция, которая проверяет, виден ли переданный параметром элемент DOM-модели. Потребность в такой возникает при разработке графических компонентов, динамически подгружающих контент при прокрутке.</td>
+</tr><tr>
+    <td>B._WidgetBase</td>
+    <td>Базовый класс для создания пользовательских контейнеров. Кстати, он также использовался как базовый для создания компонента tableview.js</td>
+</tr>
+</table>
+<div style="padding:2px;border:1px solid #888;border-radius: 5px;max-width:700px;background:#ffa;margin:auto;">
+<p>На очереди следующие доработки:</p>
+<ol>
+<li>Учёт видимости элементов в лейаутах.</li>
+<li>Добавить виджет вывода консоли (для отладки мобильных веб-приложений)</li>
+</ol>
+</div>
+<h2>Интересная литература</h2>
+<p><a name="source100"></a><shell_welcome>[Daniel and Audrey Roy Greenfeld]</shell_welcome> Two Scoops of Django. Best practices for Django 1.8 <a href="/static/tab_apps/django/html/text/data/django_twoscoops.pdf" download>скачать</a></p>
+<p><a name="source200"></a><shell_welcome>[Jim McGaw]</shell_welcome> Beginning Django E-Commerce <a href="/static/tab_apps/django/html/text/data/beginning-django-e-commerce.pdf" download>скачать</a></p>
+<p><a name="source300"></a><shell_welcome>[Lyza Danger Gardner & Jason Grigsby]</shell_welcome> Head first. Mobile Web <a href="/static/tab_apps/django/html/text/data/HeadFirst_MobileWeb.pdf" download>скачать</a></p>
+<p><a name="source400"></a><shell_welcome>[Vitor Freitas]</shell_welcome> How to Create User Sign Up View <a href="https://simpleisbetterthancomplex.com/tutorial/2017/02/18/how-to-create-user-sign-up-view.html" target="_blank">посмотреть</a></p>
+<p><a name="source500"></a><shell_welcome>[Vitor Freitas]</shell_welcome> How to Extend Django User Model <a href="https://simpleisbetterthancomplex.com/tutorial/2016/07/22/how-to-extend-django-user-model.html" target="_blank">посмотреть</a></p>
+<p><a name="source600"></a><shell_welcome>[Vitor Freitas]</shell_welcome> How to Send Email in a Django App <a href="https://simpleisbetterthancomplex.com/tutorial/2016/06/13/how-to-send-email.html" target="_blank">посмотреть</a></p>
+<p><a name="source700"></a><shell_welcome>[Vitor Freitas]</shell_welcome> How to Deploy a Django Application on RHEL 7 <a href="https://simpleisbetterthancomplex.com/tutorial/2017/05/23/how-to-deploy-a-django-application-on-rhel.html" target="_blank">посмотреть</a></p>
+<p><a name="source800"></a><shell_welcome>[Vitor Freitas]</shell_welcome> How to Create a Password Reset View <a href="https://simpleisbetterthancomplex.com/tutorial/2016/09/19/how-to-create-password-reset-view.html" target="_blank">посмотреть</a></p>
+<p><a name="source900"></a><shell_welcome>[Ruddra]</shell_welcome> Implementation of 'Forgot/Reset Password' feature in Django <a href="http://ruddra.com/2015/09/18/implementation-of-forgot-reset-password-feature-in-django/" target="_blank">посмотреть</a></p>
+<inline_code>
+import json<br/>
+from django.http import HttpResponse<br/>
+response_data = {}<br/>
+response_data['result'] = 'error'<br/>
+response_data['message'] = 'Some error message'<br/>
+return HttpResponse(json.dumps(response_data), content_type="application/json")<br/><br/>
+Или, начиная с Django 1.7:<br/>
+from django.http import JsonResponse<br/>
+return JsonResponse({'foo':'bar'})<br/>
+</inline_code><br/>
+
+<!--<p><a href="https://docs.djangoproject.com/en/1.11/topics/http/sessions/" target="_blank">Статья</a> про сессии (офиц. документация).</p>-->
+<p><a href="https://djbook.ru/rel1.8/topics/http/sessions.html" target="_blank">Статья</a> Сессии</p>
+<p><a href="https://djbook.ru/forum/topic/4312/" target="_blank">Статья</a> Проблема множественных сессий (форум).</p>
+<p><a href="https://stackoverflow.com/questions/5470210/django-one-session-per-user" target="_blank">Статья</a> Одна сессия на пользователя (форум)</p>
+<p><a href="https://docs.djangoproject.com/en/1.8/ref/csrf/" target="_blank">Статья(en 1.8)</a> <a href="https://www.djbook.ru/rel1.7/ref/contrib/csrf.html" target="_blank">Статья(ru 1.7)</a> CSRF</p>

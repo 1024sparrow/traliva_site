@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<link href="favicon.ico" rel="shortcut icon" type="image/x-icon" />
+<script src="b.js"></script>
+<script src="lineinput.js"></script>
+</head>
+<body>
+<div id="lineinput"></div><br/>
+<div id="debug_widget"></div>
+<p>Вы авторизованы как СЛОН</p>
+<a href="logout.html">Выйти</a>
+<p>Вы не авторизованы</p>
+<a href="login.html">Войти</a>
+<script>
+var doc = {userText:"initial text"};
+var statePublisher = new B.StatePublisher();
+statePublisher.setState(doc);
+
+statePublisher.registerSubscriber(new LineInput("lineinput"));
+statePublisher.registerSubscriber(new B.StateDebugWidget("debug_widget"));
+</script>
+</body>
+</html>

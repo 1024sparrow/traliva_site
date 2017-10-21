@@ -1,0 +1,36 @@
+*{font-family: 'Open Sans', sans-serif;}
+inline_code{/*Блок кода*/
+display:block;
+background:#bef;
+/*background:#8cf;*/
+/*background:#ccc;*/
+border-left: 8px solid #048;
+padding: 0 0 0 8px;
+font-family: 'Source Code Pro', monospace;
+}
+shell_welcome{/*Приглашение оболочки(shell) для отображения в блоке кода*/
+color:#800;
+}
+hl{/*выделение цветом(бледно-жёлтым)*/
+background:#ffa;
+font-family: 'Source Code Pro', monospace;
+}
+tab{/*отступ; в коде пишите <tab></tab>, без сокращения*/
+display:block;
+float:left;
+width:20px;
+min-width:30px;
+min-height:10px;
+}
+m_title{/*Надпись для блока кода*/
+color:#048;
+text-decoration:underline;
+}
+a{
+background:#048;
+color:#ffa;
+border-radius:5px;
+}
+/*td{
+border: 1px solid red;
+}*/

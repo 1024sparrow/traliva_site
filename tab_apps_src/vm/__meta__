@@ -1,0 +1,10 @@
+1.js;js:
+fullpage_js/text.js
+fullpage_js/contents.js
+fullpage_js/1.js
+2.js;js:
+fullpage_js/2.js
+init_state.js;json:
+fullpage_js/init_state.js
+style.css;css_dirprefix:
+fullpage_js/style.css

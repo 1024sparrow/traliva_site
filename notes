@@ -1,2 +1,59 @@
-70731:
-Состояние мы должны выставлять до того, как Pager его выставит в дефолтное show_page="root".
+
+var htmlString;
+{% autoescape off %}
+{% for key, value in html.items %}
+data.tabs.{{current_tab}}.html.{{key}} = document.createElement('div');
+data.tabs.{{current_tab}}.html.{{key}}.innerHTML = "{{value}}";
+{% endfor %}
+{% endautoescape %}
+
+(function(){
+var external = {
+    state: {
+        common: data.state.common,
+        page: data.tabs.{{current_tab}}
+    },
+    data: data.tabs.{{current_tab}}
+}
+{% autoescape off %}
+eval("{{script_1}}");
+eval("{{script_2}}");
+var i;
+for (i = 0 ; i < external.data.subscribers.length ; i++){
+}
+{% endautoescape %}
+})();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function Pager(){
+    this.data = {
+        state:{
+            common:{
+                show_page: '{{current_tab}}'
+            },
+            tabs:{
+                {{current_tab}}:{}
+            }
+        },
+        tabs:{
+            {{current_tab}}:{
+                html:{},
+                scope:{}, //все объявления классов и "глобальные" переменные - здесь
+                subscribers:[],
+                canvas: new B.Widget(wCanvas)
+            }
+        }
+    };
+}
