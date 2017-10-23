@@ -9,6 +9,7 @@ module.exports = {
         headerlevel_style: 'scripts/tabs_meta/headerlevel_style.js'
     },
     dir:{
-        inputdata_dir: 'scripts/tabs_meta/process_dir.js'
+        inputdata_dir: 'scripts/tabs_meta/process_dir.js',
+        ditribute_results: 'scripts/distribute_results.sh'
     }
 }

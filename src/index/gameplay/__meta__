@@ -3,12 +3,11 @@
         {
             "target":"gameplay.js",
             "source":{
+                "template": "t",
                 "list":[
-                    "start.js",
                     "header.js",
                     "pager.js",
-                    "waiting_widget.js",
-                    "finish.js"
+                    "waiting_widget.js"
                 ]
             }
         }

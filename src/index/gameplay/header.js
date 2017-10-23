@@ -3,9 +3,7 @@ function Header(wContainer){
     eContainer.id = 'header';
     this._currentTab = '';
     this._tabbuttons = {}
-{% autoescape off %}
-    var tabs_descr={{tabs_descr}};
-{% endautoescape %}
+    var tabs_descr={%% input_data/tabs_descr %%};
     var i, e;
     for (i = 0 ; i < tabs_descr.length ; i++){
         e = document.createElement('a');
@@ -18,16 +16,6 @@ function Header(wContainer){
         };})(this, tabs_descr[i]));
 
         this._tabbuttons[tabs_descr[i]] = e;
-        /*if ( '{{current_tab}}' == tabs_descr[i]){
-            e = document.createElement('div');
-            e.className = '{{current_tab}} active';
-        }
-        else{
-            e = document.createElement('a');
-            e.href = '/' + tabs_descr[i] + '/';
-            e.style.outline = 'none';
-            e.className = tabs_descr[i];
-        }*/
         eContainer.appendChild(e);
     }
     wHeader.setContent(eContainer);

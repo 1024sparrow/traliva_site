@@ -8,14 +8,11 @@ function Pager(){
             tabs:{}
         },
         common:{
-            {#html_names: {"root": [], "vm": [], "django": ["text"]}#}
-            html_names: {% autoescape off %}{{html}}{% endautoescape %}
+            html_names: {%% input_data/html_names %%}
         },
         tabs:{}
     };
-{% autoescape off %}
-    var tabs_descr={{tabs_descr}};
-{% endautoescape %}
+    var tabs_descr={%% input_data/tabs_descr %%};
     var i, name, canvas;
     for (i = 0 ; i < tabs_descr.length ; i++){
         name = tabs_descr[i];
