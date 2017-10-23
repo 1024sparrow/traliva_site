@@ -1,0 +1,16 @@
+{
+    "files":[
+        {
+            "target":"gameplay.js",
+            "source":{
+                "list":[
+                    "start.js",
+                    "header.js",
+                    "pager.js",
+                    "waiting_widget.js",
+                    "finish.js"
+                ]
+            }
+        }
+    ]
+}

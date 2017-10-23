@@ -1,0 +1,42 @@
+{
+    "files":[
+        {
+            "target": "headerlevel_style.css",
+            "source":{
+                "list": ["header.json"],
+                "types":{
+                    "header.json": ["headerlevel_style"]
+                }
+            }
+        },
+        {
+            "target": "global_bg",
+            "source":{
+                "list": ["global.json"],
+                "types":{
+                    "global.json": ["global_bg"]
+                }
+            }
+        },
+        {
+            "target": "header_height",
+            "source":{
+                "list": ["header.json"],
+                "types":{
+                    "header.json": ["header_height"]
+                }
+            }
+        },
+        {
+            "target": "src_header.json",
+            "source":{
+                "list":[
+                    "header.json"
+                ]
+            }
+        }
+    ],
+    "dir_proc":[
+        "inputdata_dir"
+    ]
+}

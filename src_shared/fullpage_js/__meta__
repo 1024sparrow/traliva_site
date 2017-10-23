@@ -1,0 +1,36 @@
+{
+    "files":[
+        {
+            "target":"1.js",
+            "type":[],
+            "source":{
+                "list":[
+                    "text.js",
+                    "contents.js",
+                    "1.js"
+                ]
+            }
+        },
+        {
+            "target": "2.js",
+            "type":[],
+            "source":{
+                "list":["2.js"]
+            }
+        },
+        {
+            "target": "init_state.js",
+            "type": [],
+            "source":{
+                "list":["init_state.js"]
+            }
+        },
+        {
+            "target": "style.css",
+            "type": ["css"],
+            "source":{
+                "list":["style.css"]
+            }
+        }
+    ]
+}

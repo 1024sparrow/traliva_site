@@ -1,0 +1,20 @@
+{
+    "height": 64,
+    "tabs":[
+        {
+            "type": "normal",
+            "width": 152,
+            "id": "root"
+        },
+        {
+            "type": "normal",
+            "width": 182,
+            "id": "vm"
+        },
+        {
+            "type": "normal",
+            "width": 112,
+            "id": "django"
+        }
+    ]
+}

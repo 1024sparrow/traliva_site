@@ -1,0 +1,14 @@
+{
+    "files":[
+        {
+            "target": "style.css",
+            "type": ["css"],
+            "source":{
+                "list":[
+                    "toplevel_waiting.css",
+                    "toplevel_loaderror.css"
+                ]
+            }
+        }
+    ]
+}

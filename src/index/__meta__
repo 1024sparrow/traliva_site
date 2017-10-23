@@ -1,0 +1,18 @@
+{
+    "files":[
+        {
+            "target": "gameplay.js",
+            "source":{
+                "template":"gameplay.js",
+                "list":[
+                    "input_data/global_bg",
+                    "input_data/header_height",
+                    "input_data/html_names",
+                    "input_data/tabs_descr"
+                ]
+            }
+        }
+    ],
+    "dir_proc":[
+    ]
+}
