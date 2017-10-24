@@ -15,8 +15,9 @@
         {
             "target": "index.html",
             "source":{
+                "template":"index.html",
                 "list":[
-                    "index.html"
+                    "input_data/style.css"
                 ]
             }
         }
