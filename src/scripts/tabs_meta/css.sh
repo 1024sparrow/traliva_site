@@ -7,7 +7,7 @@
 #echo "компилим файл \"$1\". Вставляем его в блок с id=\"$2\""
 
 init_path=$(pwd)
-if test $# -gt 1;
+if test $# -gt 2;
 then cd $2
 fi
 echo -n > $1.tmp

@@ -46,7 +46,6 @@ child_process.execSync(`rm ${path.resolve(dirpath, 'tab_apps', 'style.css')}`);
 for (const tabObj of h.tabs){
     compress_css(path.resolve(dirpath, 'tab_apps', tabObj.id, 'style.css'), tabObj.id);
     style += fs.readFileSync(path.resolve(dirpath, 'tab_apps', tabObj.id, 'style.css'));
-    //boris here: После чтения того файла, мы должны его удалить.
     child_process.execSync(`rm ${path.resolve(dirpath, 'tab_apps', tabObj.id, 'style.css')}`);
 }
 fs.writeFileSync(path.resolve(dirpath, 'style.css'), style, 'utf8');
