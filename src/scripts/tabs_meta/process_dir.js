@@ -7,7 +7,7 @@ var child_process = require('child_process');
 var StringDecoder = require('string_decoder').StringDecoder;
 var DECODER = new StringDecoder('utf8');
 
-console.log('%%%:'+process.argv);
+//console.log('%%%:'+process.argv);
 
 var dirpath = path.resolve(process.argv[2], process.argv[3]);
 var filepath = path.resolve(dirpath, 'src_header.json');
