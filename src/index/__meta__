@@ -11,6 +11,14 @@
                     "input_data/tabs_descr"
                 ]
             }
+        },
+        {
+            "target": "index.html",
+            "source":{
+                "list":[
+                    "index.html"
+                ]
+            }
         }
     ],
     "dir_proc":[
