@@ -32,7 +32,6 @@ function Pager(){
     this.current_tab = '';
     var self = this;
     window.onpopstate = function(event){
-        //console.log(event.state);
         self._state.common.show_page = event.state;
         self._registerStateChanges();
     }
@@ -55,7 +54,6 @@ Pager.prototype.iterateTaskStack = function(result, firstCall){
         });
     }
     else if (this.loadResults.length) { // если не было ошибки во время загрузки
-        console.log('Бла-бла-бла для вкладки \''+this.current_tab+'\'');
         // рендерим html
         // выполняем скрипты
         var e, script;
@@ -72,7 +70,6 @@ Pager.prototype.iterateTaskStack = function(result, firstCall){
         //переключаем состояние 
         this._state.page = this.data.state.tabs[this._state.common.show_page];
         this._registerStateChanges();
-        console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
         console.log(JSON.stringify(this._state));
 
         //Выполняем скрипты
@@ -81,7 +78,6 @@ Pager.prototype.iterateTaskStack = function(result, firstCall){
         try{eval(this.loadResults.pop());}catch(e){var err = e.constructor('Error in 1.js: '+e.message);err.lineNumber=e.lineNumber-err.lineNumber+1;throw err;};
         // 2.js - экземпляры
         try{eval(this.loadResults.pop());}catch(e){var err = e.constructor('Error in 2.js: '+e.message);err.lineNumber=e.lineNumber-err.lineNumber+1;throw err;};
-        console.log(JSON.stringify(EXTERNAL));
         //eval(this.loadResults.pop());
 
         //Подключаем подписчиков
@@ -142,7 +138,7 @@ Pager.prototype.processStateChanges = function(s){
         this._registerStateChanges();
     }
     if (this.current_tab != s.common.show_page){
-        console.log('Меняю вкладку');
+        //console.log('Меняю вкладку');
 
         //для текущей вкладки (this.current_tab) запускаем выжималку Состояния... - ?
         if (this.current_tab.length){
