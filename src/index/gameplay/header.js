@@ -1,4 +1,5 @@
 function Header(wContainer){
+    B.StateSubscriber.call(this);
     var eContainer = document.createElement('div');
     eContainer.id = 'header';
     this._currentTab = '';

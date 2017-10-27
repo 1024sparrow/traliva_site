@@ -1,4 +1,5 @@
 function WaitingWidget(wContainer){
+    B.StateSubscriber.call(this);
     this.isLoading = false;
     this.widget = wContainer;
     var e = document.createElement('div');

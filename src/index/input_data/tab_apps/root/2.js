@@ -23,11 +23,11 @@ wContentsHeader.addItem(wContentsTitle);
 }*/
 
 EXTERNAL.canvas.setContent(wRoot);
-EXTERNAL.subscribers.push(new B.StateToUriMapper(EXTERNAL.scope.states));
-EXTERNAL.subscribers.push(new EXTERNAL.scope.Text(wText));
-EXTERNAL.subscribers.push(new EXTERNAL.scope.Contents(wContents, EXTERNAL.scope.states));
-EXTERNAL.subscribers.push(new EXTERNAL.scope.ContentsButton(wContentsButton));
-EXTERNAL.subscribers.push(new EXTERNAL.scope.Title(wContentsTitle));
+//EXTERNAL.subscribers.push(new B.StateToUriMapper(EXTERNAL.scope.states));
+EXTERNAL.subscribers.push(new EXTERNAL.scope.Text(wText).useSubstate('page'));
+EXTERNAL.subscribers.push(new EXTERNAL.scope.Contents(wContents, EXTERNAL.scope.states).useSubstate('page'));
+EXTERNAL.subscribers.push(new EXTERNAL.scope.ContentsButton(wContentsButton).useSubstate('page'));
+//EXTERNAL.subscribers.push(new EXTERNAL.scope.Title(wContentsTitle));
 
 /*var eDebug = document.createElement('div');
 var wDebug = new B.Widget(wRoot);

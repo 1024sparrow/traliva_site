@@ -99,6 +99,7 @@ EXTERNAL.scope.CONTENTS_BUTTON_GEOMETRY = {w:169,h:49};
 'use strict';
 
 function Contents(wContainer, statesObj){
+    B.StateSubscriber.call(this);
     //wContainer.setContent(undefined, '#faa');
     this._statesObj = statesObj;
     wContainer.setVisible(false);
@@ -286,6 +287,7 @@ EXTERNAL.scope.Contents = Contents;
 'use strict';
 
 function ContentsButton(wContainer){
+    B.StateSubscriber.call(this);
     this.eBn = document.createElement('div');
     this.eBn.className = 'contents_button';
     this.eBn.addEventListener(
@@ -318,6 +320,7 @@ EXTERNAL.scope.ContentsButton = ContentsButton;
 'use strict';
 
 function Text(wContainer){
+    B.StateSubscriber.call(this);
     EXTERNAL.html.text.style.display = 'block';
     wContainer.setContent(EXTERNAL.html.text, '#ffc');
     wContainer._onScrolled = (function(self){return function(pos){self._onScrolled(pos)};})(this);
@@ -390,7 +393,7 @@ Text.prototype._onResized = function(){
 Text.prototype._init = function(){
     var retval = [];
 
-	var list = TEXT.children;
+	var list = EXTERNAL.html.text.children;
 	var reHeaderTags = /^H([1-6])$/;
     var e, tmp, cand, hasBurned;
     var idCounter = 1;
@@ -516,6 +519,7 @@ function getFontSizes(count, availSpace){
 }
 
 function Title(wContainer){
+    B.StateSubscriber.call(this);
 	this._height = 32;
 	var wStack = new B.Stack(wContainer);
 	var colors = ['#afa','#48f','#ffa'];

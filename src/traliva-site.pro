@@ -10,6 +10,7 @@ module.exports = {
     },
     dir:{
         inputdata_dir: 'scripts/tabs_meta/process_dir.js',
-        distribute_results: 'scripts/distribute_results.sh'
+        distribute_results: 'scripts/distribute_results.sh',
+        tab__root__styles: 'scripts/tabs/tab__styles.css'
     }
 }
