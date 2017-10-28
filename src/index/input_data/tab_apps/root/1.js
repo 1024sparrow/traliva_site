@@ -561,34 +561,36 @@ Title.prototype._onResized = function(w,h){
 }
 Title.prototype._rebuild = function(){
 	var retval = '', cand;
-	var style;
-	var tt = 0.3;
-	var koeffs = getKoeffs(this._state.cur_chapter.title.length);
-	for (var i = 0 ; i < this._state.cur_chapter.title.length ; i++){
-	}
-	//var fontSizes = getFontSizes(this._state.cur_chapter.title.length, (this._height*(1.0+tt)) - 4);
-	//var fontSizes = getFontSizes(this._state.cur_chapter.title.length, (this._height*(1.0+(this._state.title.length == 1)?0:tt)) - 4);
-	//var fontSizes = getFontSizes(this._state.cur_chapter.title.length, (this._state.title.length == 1) ? (this._height - 8) : ((this._height*(1.0+tt)) - 8));
-	var tmp = __s__over;
-	if (this._state.cur_chapter.title.length < __s.length)
-		tmp = __s[this._state.cur_chapter.title.length];
-	var fontSizes = getFontSizes(this._state.cur_chapter.title.length, tmp * this._height);
-	var colors = getColors(this._state.cur_chapter.title.length);
-	var sum = 0;
-	var fontSize = 0;
-	for (var level = 0 ; level < this._state.cur_chapter.title.length ; level++){
-		style = 'margin-left:'+(5+level*10)+'px;';
-		style += 'color:'+colors[level]+';';
-		tt = koeffs[level];
-		style += 'top:'+(sum - fontSize*tt)+'px;';
-		sum -= fontSize*tt;
-		fontSize = fontSizes[level];
-		style += 'font-size:'+fontSize+'px;';
-		//style += 'max-height:'+fontSizes[level]+'px;';
-		cand = '<p style=\''+style+'\'>' + this._state.cur_chapter.title[level] + '</p>';
-		retval += cand;
-		sum += fontSize;
-	}
+    if (this._state && this._state.hasOwnProperty('cur_chapter')){
+        var style;
+        var tt = 0.3;
+        var koeffs = getKoeffs(this._state.cur_chapter.title.length);
+        for (var i = 0 ; i < this._state.cur_chapter.title.length ; i++){
+        }
+        //var fontSizes = getFontSizes(this._state.cur_chapter.title.length, (this._height*(1.0+tt)) - 4);
+        //var fontSizes = getFontSizes(this._state.cur_chapter.title.length, (this._height*(1.0+(this._state.title.length == 1)?0:tt)) - 4);
+        //var fontSizes = getFontSizes(this._state.cur_chapter.title.length, (this._state.title.length == 1) ? (this._height - 8) : ((this._height*(1.0+tt)) - 8));
+        var tmp = __s__over;
+        if (this._state.cur_chapter.title.length < __s.length)
+            tmp = __s[this._state.cur_chapter.title.length];
+        var fontSizes = getFontSizes(this._state.cur_chapter.title.length, tmp * this._height);
+        var colors = getColors(this._state.cur_chapter.title.length);
+        var sum = 0;
+        var fontSize = 0;
+        for (var level = 0 ; level < this._state.cur_chapter.title.length ; level++){
+            style = 'margin-left:'+(5+level*10)+'px;';
+            style += 'color:'+colors[level]+';';
+            tt = koeffs[level];
+            style += 'top:'+(sum - fontSize*tt)+'px;';
+            sum -= fontSize*tt;
+            fontSize = fontSizes[level];
+            style += 'font-size:'+fontSize+'px;';
+            //style += 'max-height:'+fontSizes[level]+'px;';
+            cand = '<p style=\''+style+'\'>' + this._state.cur_chapter.title[level] + '</p>';
+            retval += cand;
+            sum += fontSize;
+        }
+    }
 	this.eTxt.innerHTML = retval;
 }
 EXTERNAL.scope.Title = Title;

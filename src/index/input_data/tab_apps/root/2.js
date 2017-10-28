@@ -27,7 +27,7 @@ EXTERNAL.canvas.setContent(wRoot);
 EXTERNAL.subscribers.push(new EXTERNAL.scope.Text(wText).useSubstate('page'));
 EXTERNAL.subscribers.push(new EXTERNAL.scope.Contents(wContents, EXTERNAL.scope.states).useSubstate('page'));
 EXTERNAL.subscribers.push(new EXTERNAL.scope.ContentsButton(wContentsButton).useSubstate('page'));
-//EXTERNAL.subscribers.push(new EXTERNAL.scope.Title(wContentsTitle));
+EXTERNAL.subscribers.push(new EXTERNAL.scope.Title(wContentsTitle).useSubstate('page'));
 
 /*var eDebug = document.createElement('div');
 var wDebug = new B.Widget(wRoot);
