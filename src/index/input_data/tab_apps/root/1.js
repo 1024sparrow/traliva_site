@@ -325,6 +325,7 @@ function Text(wContainer){
     wContainer.setContent(EXTERNAL.html.text, '#ffc');
     wContainer._onScrolled = (function(self){return function(pos){self._onScrolled(pos)};})(this);
     wContainer._onResized = (function(self){return function(pos){self._onResized()};})(this);
+    wContainer._div.className = 'text';
     this._wContainer = wContainer;
     this._offsetMap = [];//соответствие смещения по странице позиции в оглавлении
     this._isVirgin = true;
