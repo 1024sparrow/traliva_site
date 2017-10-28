@@ -1,0 +1,66 @@
+.contents{
+    width: 100%;
+}
+.contents .icon{
+    width:32px;
+    height:32px;
+}
+.contents .icon.expanded{
+    background: url(/static/tabs/root/treeitem.png) no-repeat 0 0;
+}
+.contents .icon.collapsed{
+    background: url(/static/tabs/root/treeitem.png) no-repeat 0 -32px;
+}
+.contents .label{
+    text-decoration:none;
+    color:#afa;
+}
+.contents tr:hover{
+    background: #000;
+}
+.contents .label{
+    display: block;
+    height: 100%;
+}
+.contents_button{
+    /*background:#0f0;*/
+    background: url(/static/tabs/root/contents_button.png) no-repeat 0 0;
+    width: 169px;
+    height: 49px;
+}
+.contents_button:hover{
+    background: url(/static/tabs/root/contents_button.png) no-repeat 0 -49px;
+}
+.contents_button.active{
+    background: url(/static/tabs/root/contents_button.png) no-repeat 0 -98px;
+}
+.contents_button.active:hover{
+    background: url(/static/tabs/root/contents_button.png) no-repeat 0 -147px;
+}
+/*@media screen and (max-width: 699px){
+    .contents_button{
+        background: url(contents_button_min.png) no-repeat 0 0;
+    }
+    .contents_button:hover{
+        background: url(contents_button_min.png) no-repeat 0 -49px;
+    }
+    .contents_button.active{
+        background: url(contents_button_min.png) no-repeat 0 -98px;
+    }
+    .contents_button.active:hover{
+        background: url(contents_button_min.png) no-repeat 0 -147px;
+    }
+}*/
+.title{
+	cursor: default;
+}
+.title *{
+	margin: 0px;
+}
+.title > p{
+	position: relative;
+}
+.title>p>p{
+	position:absolute;
+	white-space: nowrap;
+}
