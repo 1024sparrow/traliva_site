@@ -140,7 +140,6 @@ Pager.prototype.processStateChanges = function(s){
     }
     if (this.current_tab != s.common.show_page){
         //console.log('Меняю вкладку');
-        this.current_tab = s.common.show_page;
 
         //для текущей вкладки (this.current_tab) запускаем выжималку Состояния... - ?
         if (this.current_tab.length){
@@ -171,6 +170,7 @@ Pager.prototype.processStateChanges = function(s){
         else{//Если такой нет среди загруженных:
             this._initializeTabLoading();
         }
+        this.current_tab = s.common.show_page;
     }
 }
 Pager.prototype.onRetryDownloadTabBnClicked = function(){
