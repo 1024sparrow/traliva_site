@@ -18,6 +18,8 @@ build/
 tests/report/
 root_app/__pycache__
 django_project/__pycache__
+templates/
+static/
 
 .htaccess
 *~
