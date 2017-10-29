@@ -336,6 +336,7 @@ Text.prototype.constructor = Text;
 Text.prototype.processStateChanges = function(s){
     if (this._isVirgin){
         this._init();
+        setTimeout((function(self){return function(){self._onResized();};})(this), 0);//Знакомьтесь: это КОСТЫЛЬ.
         this._isVirgin = false;
     }
     var tmpId = s.hasOwnProperty('cur_chapter') ? s.cur_chapter.id : undefined;
