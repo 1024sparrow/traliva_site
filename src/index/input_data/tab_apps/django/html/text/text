@@ -177,7 +177,7 @@ from django.contrib import admin<br/>
 <p>Создаём проект hw3, приложение root_app. На этот раз приложение у нас будет одно, да несколько страничек будет определено в этом одном приложении.</p>
 <p>Создаём модель и таблицу в БД - Books, двух полей - author и title - будет достаточно. Через админку заносим три книги: [author_1]'book title 1', [author_2]'book title 2' и [author_3]'book title 3'</p>
 <p>В той директории, где лежат папки проекта и приложения создаём директорию templates, а в ней директорию root_app. И вот там уже будем создавать файл шаблона catalogue.html. Для того, чтобы нами созданная директория templates подхватывалась Django, необходимо в settings.py (hw3/hw3/) вставить одну строчку:</p>
-<img src="++++templ_sett.png"></img>
+<img src="/static/tab_apps/django/html/text/templ_sett.png"></img>
 <p>В процессе создания шаблона будут использоваться запросы к модели. Напоминаю, что в HelloWorld №2 мы запускали консоль с доступом к модели.</p>
 <inline_code>
 <m_title>hw3 / templates / root_app / catalogue.html:</m_title><br/>
@@ -350,7 +350,7 @@ urlpatterns = [<br/>
 &lt;/body><br/>
 &lt;/html><br/>
 </inline_code>
-<p>Исходные бинарные файлы: <a href="++++data/hw5/ural_next.jpg">картинка</a>, <a href="++++data/hw5/favicon.ico">иконка</a>, <a href="++++data/hw5/style.css">таблицы стилей</a>. </p>
+<p>Исходные бинарные файлы: <a href="/static/tab_apps/django/html/text/data/hw5/ural_next.jpg">картинка</a>, <a href="/static/tab_apps/django/html/text/data/hw5/favicon.ico">иконка</a>, <a href="/static/tab_apps/django/html/text/data/hw5/style.css">таблицы стилей</a>. </p>
 <p>Там же, где уже находится директория templates, создаём директорию static. Структура папки та же, что и у templates. Для того, чтобы наша папочка static подцеплялась, должны кое-что добавить в файл settings.py (в директории hw5/h5/):</p>
 <inline_code><m_title> hw5 / root_app / settings.py :</m_title><br/>
 # Static files (CSS, JavaScript, Images)<br/>
@@ -503,7 +503,7 @@ TEMPLATES = [<br/>
  <tab></tab>'/var/www/static/',<br/>
  ]</hl>
 </inline_code>
-<p>Сразу положим себе файлы подготовленных мною заготовок. Файлы <a href="++++data/hw6/favicon.ico" download>favicon.ico</a>, <a href="++++data/hw6/b.js" download>b.js</a> и <a href="++++data/hw6/lineinput.js" download>lineinput.js</a> помещаем в папку для статических файлов, а файлы <a href="++++data/hw6/index.html" download>index.html</a> и <a href="++++data/hw6/login.html" download>login.html</a> кладём в папку для шаблонов.</p>
+<p>Сразу положим себе файлы подготовленных мною заготовок. Файлы <a href="/static/tab_apps/django/html/text/data/hw6/favicon.ico" download>favicon.ico</a>, <a href="/static/tab_apps/django/html/text/data/hw6/b.js" download>b.js</a> и <a href="/static/tab_apps/django/html/text/data/hw6/lineinput.js" download>lineinput.js</a> помещаем в папку для статических файлов, а файлы <a href="/static/tab_apps/django/html/text/data/hw6/index.html" download>index.html</a> и <a href="/static/tab_apps/django/html/text/data/hw6/login.html" download>login.html</a> кладём в папку для шаблонов.</p>
 <p>Делаем так, чтобы при попадании на наш адрес (localhost:8080), пользователь видел страницу, которая сейчас лежит у нас в шаблонах под именем index.html</p>
 <inline_code><m_title>hw6 / hw6 / urls.py :</m_title><br/>
 from django.conf.urls import url<hl>, include</hl><br/>
@@ -896,7 +896,7 @@ StateInLinkSaver.prototype.processStateChanges = function(s){<br/>
  <tab></tab>       return redirect('%s?state=%s' % (pNext, pState))</hl><br/>
 </inline_code>
 <p>Теперь у нас получилось вполне законченное веб-приложение, в которое мы можем входить и выходить.</p>
-<video src="++++data/hw6/hw6.mp4" controls>dfg</video>
+<video src="/static/tab_apps/django/html/text/data/hw6/hw6.mp4" controls>dfg</video>
 
 <h2>Немного теории: Безопасность и шифрование</h2>
 <p>Тут используются страшные слова "сессия" и "AJAX", которые будут описаны позднее в HelloWorld №7. К сожалению, данный материал должен быть изложен ранее, так что просто сильно не огорчаемся, если не совсем понимаем, о чём идёт речь.</p>
@@ -997,7 +997,7 @@ MIDDLEWARE = [<br/>
 <p style="border-radius:10px;background:#444;color:#ccc;padding:20px;"> Разработка веб-приложения на локальных файлах ведётся либо в Windows (Firefox + Notepad++), либо в Ubuntu(firefox + vim или notepadqq). <br/>Chrome в Windows (без использования специальных ключей запуска) не позволяет грузить AJAX из локальных файлов, специальные дистрибутивы Linux блокируют загрузку AJAX из локальных файлов по соображениям безопасности.<br/> </p>
 <p>Если вы работаете в Windows с браузером Google Chrome, вам необходимо запустить Chrome с ключом --allow-file-access-from-files. Для этого закрываем все открытые окна Chrome, нажимаем системную кнопку Пуск, ищем Chrome (в виндовс-7 можно просто набрать с клавиатуры), правой кнопкой мыши -> расположение файла. Найденного exe-шника делаем ярлык. Открываем свойства -> вкладка "Ярлык" -> В поле "Объект" в конце добавляем  --allow-file-access-from-files (уже после закрывающих кавычек). Отныне запускаем браузер с этого ярлыка, и у нас не будет проблем с AJAX-запросами к локально лежащим файлам.</p>
 <p>Для защиты от CSRF-атак нашего веб-приложения необходимо подключить скрипт b_django.js после b.js, но мы этого не будем - это надо делать уже при публикации веб-приложения - в работе используются Cookies, мы ж не будем пытаться хранить в своём браузере куки на переменчивый localhost.</p>
-<p>В работе нам понадобятся <a href="++++data/hw7/b.js" download>скрипт b.js</a>, <a href="++++data/hw7/favicon.ico" download>иконка</a>, скрипты <a href="++++data/hw7/treeview.js" download>treeview.js</a> (которому, в свою очередь, требуются картинки <a href="++++data/hw7/treeicons.png">treeicons.png</a> и <a href="++++data/hw7/states.png">states.png</a>) и <a href="++++data/hw7/tableview.js" download>tableview.js</a>. Все эти файлы мы сложим в одной директории - "hw7 / prototype" (как прототип того, что мы будем делать на Django). Пишем нашу заготовку на html, следим, чтобы кодировка была UTF-8:</p>
+<p>В работе нам понадобятся <a href="/static/tab_apps/django/html/text/data/hw7/b.js" download>скрипт b.js</a>, <a href="/static/tab_apps/django/html/text/data/hw7/favicon.ico" download>иконка</a>, скрипты <a href="/static/tab_apps/django/html/text/data/hw7/treeview.js" download>treeview.js</a> (которому, в свою очередь, требуются картинки <a href="/static/tab_apps/django/html/text/data/hw7/treeicons.png">treeicons.png</a> и <a href="/static/tab_apps/django/html/text/data/hw7/states.png">states.png</a>) и <a href="/static/tab_apps/django/html/text/data/hw7/tableview.js" download>tableview.js</a>. Все эти файлы мы сложим в одной директории - "hw7 / prototype" (как прототип того, что мы будем делать на Django). Пишем нашу заготовку на html, следим, чтобы кодировка была UTF-8:</p>
 <inline_code><m_title>hw7 / prototype / index.html :</m_title><br/>
 <hl>&lt;!doctype html><br/>
 &lt;html><br/>
@@ -1274,7 +1274,7 @@ from django.contrib import admin<br/>
 <p>Теперь идём в админку (<hl>localhost:8080/admin/</hl> в браузере) и добавляем книги в нашу БД.</p>
 <p>Чтобы занесённые нами в БД книги отображались (я занёс 3, в то время как на файлах у нас было зашито только две), поправим вьюху:</p>
 <div style="overflow:auto;background:#000;">
-<img src="++++data/hw7/hw7_1.png"/>
+<img src="/static/tab_apps/django/html/text/data/hw7/hw7_1.png"/>
 </div>
 <p style="background:#af0">Добавили новые модели... (надо описать!), модели реляционные, надо разобраться как настроить админку для нормальной (удобной т.е.) работы с админкой: <a href="https://www.youtube.com/watch?v=5SfdL1seDoE">Полноразмерный пример (видео)</a>, <a href="https://www.youtube.com/watch?v=nboiaNlX_Cs">Краткая выжимка теории (рус)</a>, <a href="https://www.youtube.com/watch?v=Xb9zfoJJzWg">Обзор админки в Dj-1.9 (good english)</a>, <a href="https://docs.djangoproject.com/en/1.11/ref/contrib/admin/">Офиц. документация</a></p>
 <p>Добавим модели (т.е. таблицы БД) для хранения магазинов (Market) и наличия книг в магазинах (BookMarket).</p>
@@ -1836,7 +1836,7 @@ def edit(request):<br/>
 
 <h2>Hello World №9: Наследование шаблонов и полноценная авторизация</h2>
 <p>В данном примере мы реализуем полноценный механизм авторизации: логин-разлогин, регистрация новых пользователей (с подтверждением электронной почты), с восстановлением пароля. Всё по-взрослому. Максимально будем использовать Django.</p>
-<p>Прежде чем создавать проект на Django, мы должны написать прототип на статических файлах - так, чтобы красиво было. Я написал прототип с использованием библиотеки bootstrap (<a href="https://getbootstrap.com" target="_blank">getbootstrap.com</a>), которая, в свою очередь, использует библиотеку <a href="https://jquery.com/" target="_blank">jQuery</a>. Готовый прототип (там сделана шапка с выпадающим меню по авторизации и страница логина) скачайте <a href="++++data/hw9/hw9_prototype.zip" download>здесь</a> (не забудьте распаковать архив перед запуском странички). Сначала я писал base.html, потом скопировал его в login.html и туда уже вставлял форму логина.</p>
+<p>Прежде чем создавать проект на Django, мы должны написать прототип на статических файлах - так, чтобы красиво было. Я написал прототип с использованием библиотеки bootstrap (<a href="https://getbootstrap.com" target="_blank">getbootstrap.com</a>), которая, в свою очередь, использует библиотеку <a href="https://jquery.com/" target="_blank">jQuery</a>. Готовый прототип (там сделана шапка с выпадающим меню по авторизации и страница логина) скачайте <a href="/static/tab_apps/django/html/text/data/hw9/hw9_prototype.zip" download>здесь</a> (не забудьте распаковать архив перед запуском странички). Сначала я писал base.html, потом скопировал его в login.html и туда уже вставлял форму логина.</p>
 <p>Теперь, когда прототип у нас есть, создаём проект Django под именем hw9.</p>
 <inline_code><m_title>Коммандная строка:</m_title><br/>
 <shell_welcome>$</shell_welcome> django-admin startproject hw9<br/>
@@ -2422,7 +2422,7 @@ urlpatterns = [<br/>
 <p>То, что мы новый url добавили в начало, а не в конец, принципиально важно - дело в том, что далее следует иклюд, под который password_change тоже попадает.</p>
 
 <h2>Hello World №10: Разворачиваем проект по протоколу HTTPS (с использованием услуг хостинга)</h2>
-<p>Допустим, у нас есть некий проект, который мы хотим разместить в интернете. Пусть это будет наш проект hw3. Если у вас (вдруг!) нет исходников, <a href="++++data/hw10/hw3.tar.gz" download>скачайте</a> их и распакуйте командой "tar -xf hw3.tar.gz" (в результате появится папочка hw3 с проектом).</p>
+<p>Допустим, у нас есть некий проект, который мы хотим разместить в интернете. Пусть это будет наш проект hw3. Если у вас (вдруг!) нет исходников, <a href="/static/tab_apps/django/html/text/data/hw10/hw3.tar.gz" download>скачайте</a> их и распакуйте командой "tar -xf hw3.tar.gz" (в результате появится папочка hw3 с проектом).</p>
 <p>Размещать проект будем на сайте <a href="https://fullspace.ru/?pnum=18189" target="_blank">fullspace.ru</a> . Зарегистрируемся на этом сайте. Нам будет предложен тестовый период (бесплатный) 7 дней, в течение которого мы должны будем оплатить хостинг в соответствии с выбранным тарифным планом. Самый дешёвый тариф - "Single Space" - 80р./месяц. Нам необходимо сделать следующие вещи:</p>
 <ul>
 <li>Зарегистрировать домен (по какому адресу будет располагаться наш сайт)</li>
@@ -2464,7 +2464,7 @@ urlpatterns = [<br/>
 <p>Следует чётко различать клиентскую и серверную части. Клиентская часть представлена JavaScript-ом, а серверная - Django(python).</p>
 <p>В js-файлах для вывода в консоль достаточно написать console.log("Привет! Я со странички!"). Консольный вывод следует смотреть в консоли браузера - не той консоли, из которой, возможно, вы браузер запустили, а из той консоли, которая появляется по нажатии <span style="padding:2px;border:1px solid #888;border-radius: 5px;">Ctrl + Shift + I</span>. Если вам посчастливилось отлаживать сайт на смартфоне (да уж, нелёгкая участь...), то вам может помочь вывод всплывающих сообщений: alert("Привет! Я со странички!"), а вообще - думаю, <span style="background:#af0;";>в мой фреймворк b.js надо добавить</span> опцию захвата всего консольного вывода приложения в отладочный виджет (см. <a href="https://stackoverflow.com/questions/11403107/capturing-javascript-console-log">сюда</a> и <a href="https://developer.mozilla.org/en/docs/Web/API/console">сюда</a>). Ещё есть <a href="https://jsconsole.com/" target="_blank">решение</a> для перехвата консольного вывода в мобильных браузерах - немного геморройное(у меня регярно отваливалось соединение), но работает. <span style="color:#888;">Для тех, кто захочет попробовать - откройте новую вкладку в моб. браузере, зайдите на указанные в ссылке сайт, наберите ":listen"(без кавычек) и следуйте инструкциям (надо будет добавить отображённую строку в HTML-код вашего веб-приложения, обновить вашу страничку на мобиле, и на вкладке с jsconsole.com пойдёт консольный вывод из вашего моб. браузера).</span></p>
 <p>Да, кстати! Не забывайте писать 'use strict'; в начале каждого js-файла (а весь код старайтесь писать в js-файлах, а не встраивать в HTML) - тогда браузер будет выявлять случаи обращения к несуществующим переменным и вообще будет вам писать об ошибках в консоль. Если эта строчка пойдёт в production, думаю, ничего страшного не будет.</p>
-<p>Если вы используете "подписчик-издатель состояний" из моего фреймворка (классы B.StatePublisher и B.StateSubscriber), то я настоятельно рекоммендую на время разработки включить в страничку отладочный виджет B.StateDebugWidget, который отображает в режиме реального времени состояние странички, а также позволяет вносить правки в это состояние - см. <a href="++++data/hw6/index_html" target="_blank">пример</a> из Hello World №6.</p>
+<p>Если вы используете "подписчик-издатель состояний" из моего фреймворка (классы B.StatePublisher и B.StateSubscriber), то я настоятельно рекоммендую на время разработки включить в страничку отладочный виджет B.StateDebugWidget, который отображает в режиме реального времени состояние странички, а также позволяет вносить правки в это состояние - см. <a href="/static/tab_apps/django/html/text/data/hw6/index_html" target="_blank">пример</a> из Hello World №6.</p>
 <p>Когда я накидываю структуру виджетов, я обычно каждому виджету (B.Widget) устанавливаю пустой контент с уникальным цветом фона - например, setContent(undefined, '#f00') - так на этапе, когда у вас ещё не подключены компоненты, уже видно, где что должно будет появиться.</p>
 <p>Прежде чем добавлять js-компонент в Django-проект, я его проверяю на отдельной тестовой страничке (т.е. пишу страничку как файл и запускаю в браузере прямо из файловой системы). Браузер Firefox (проверял только в linux-е) позволяет также подгружать данные из локальных файлов по AJAX. Chrome, если запускать без специальных ключей, НЕ позволяет грузить по AJAX локальные данные.</p>
 <p>Если вы хотите посмотреть структуру нагенерированного кода HTML, то там же, где и консоль, есть вкладка "Dom and Style Inspector"(firefox, аналогичная есть и вдругих десктопных браузерах) - она вам и HTML-код покажет, и подсветит на страничке элементы, соответствующие коду под курсором, и даже позволит прям в браузере подкорректировать HTML-код, и посмотреть, как изменится отображение.</p>
@@ -2511,9 +2511,9 @@ urlpatterns = [<br/>
 </ol>
 </div>
 <h2>Интересная литература</h2>
-<p><a name="source100"></a><shell_welcome>[Daniel and Audrey Roy Greenfeld]</shell_welcome> Two Scoops of Django. Best practices for Django 1.8 <a href="++++data/django_twoscoops.pdf" download>скачать</a></p>
-<p><a name="source200"></a><shell_welcome>[Jim McGaw]</shell_welcome> Beginning Django E-Commerce <a href="++++data/beginning-django-e-commerce.pdf" download>скачать</a></p>
-<p><a name="source300"></a><shell_welcome>[Lyza Danger Gardner & Jason Grigsby]</shell_welcome> Head first. Mobile Web <a href="++++data/HeadFirst_MobileWeb.pdf" download>скачать</a></p>
+<p><a name="source100"></a><shell_welcome>[Daniel and Audrey Roy Greenfeld]</shell_welcome> Two Scoops of Django. Best practices for Django 1.8 <a href="/static/tab_apps/django/html/text/data/django_twoscoops.pdf" download>скачать</a></p>
+<p><a name="source200"></a><shell_welcome>[Jim McGaw]</shell_welcome> Beginning Django E-Commerce <a href="/static/tab_apps/django/html/text/data/beginning-django-e-commerce.pdf" download>скачать</a></p>
+<p><a name="source300"></a><shell_welcome>[Lyza Danger Gardner & Jason Grigsby]</shell_welcome> Head first. Mobile Web <a href="/static/tab_apps/django/html/text/data/HeadFirst_MobileWeb.pdf" download>скачать</a></p>
 <p><a name="source400"></a><shell_welcome>[Vitor Freitas]</shell_welcome> How to Create User Sign Up View <a href="https://simpleisbetterthancomplex.com/tutorial/2017/02/18/how-to-create-user-sign-up-view.html" target="_blank">посмотреть</a></p>
 <p><a name="source500"></a><shell_welcome>[Vitor Freitas]</shell_welcome> How to Extend Django User Model <a href="https://simpleisbetterthancomplex.com/tutorial/2016/07/22/how-to-extend-django-user-model.html" target="_blank">посмотреть</a></p>
 <p><a name="source600"></a><shell_welcome>[Vitor Freitas]</shell_welcome> How to Send Email in a Django App <a href="https://simpleisbetterthancomplex.com/tutorial/2016/06/13/how-to-send-email.html" target="_blank">посмотреть</a></p>
