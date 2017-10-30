@@ -57,10 +57,10 @@
 .title *{
 	margin: 0px;
 }
-.title > p{
+.title p{
 	position: relative;
 }
-.title>p>p{
+.title p>p{
 	position:absolute;
 	white-space: nowrap;
 }
